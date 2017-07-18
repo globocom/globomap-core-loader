@@ -1,0 +1,1 @@
+# globomap-core-loader
