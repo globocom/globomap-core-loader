@@ -1,0 +1,4 @@
+requests==2.4.3
+pika==0.10.0
+mock==1.3.0
+globomap-driver-napi==0.0.dev1
