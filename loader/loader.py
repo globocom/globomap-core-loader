@@ -1,8 +1,12 @@
 import importlib
+import json
 import logging
 from threading import Thread
 from globomap import GloboMapClient, GloboMapException
-from settings import GLOBOMAP_API_ADDRESS, DRIVERS
+from rabbitmq.client import RabbitMQClient
+from settings import GLOBOMAP_API_ADDRESS, DRIVERS, GLOBOMAP_RMQ_USER, GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_HOST, \
+    GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_VIRTUAL_HOST, GLOBOMAP_RMQ_ERROR_EXCHANGE
+
 
 
 class CoreLoader(object):
@@ -66,9 +70,17 @@ class DriverWorker(Thread):
             except GloboMapException:
                 self.log.exception("Error updating element %s" % update)
                 self.exception_handler.handle_exception(update)
+            except Exception:
+                self.exception_handler.handle_exception(update)
 
 
 class UpdateExceptionHandler(object):
 
+    def __init__(self):
+        self.rabbit_mq = RabbitMQClient(
+            GLOBOMAP_RMQ_HOST, GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_USER,
+            GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_VIRTUAL_HOST
+        )
+
     def handle_exception(self, update):
-        pass # TODO: return message to the driver OR send to a queue to be handled later on
+        self.rabbit_mq.post_message(GLOBOMAP_RMQ_ERROR_EXCHANGE, update['type'], json.dumps(update))

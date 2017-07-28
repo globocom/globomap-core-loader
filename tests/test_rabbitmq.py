@@ -20,13 +20,20 @@ class TestRabbitMQClient(unittest.TestCase):
         pika_mock.basic_get.assert_called_once_with('queue_name')
 
     def test_expected_exception(self):
-        pika_mock = self._mock_pika(None)
+        self._mock_pika(None)
         rabbitmq = RabbitMQClient('localhost', 5672, 'user', 'password', '/')
 
         try:
             rabbitmq.get_message(None)
         except Exception, e:
             self.assertEqual("Queue name must be informed", e.message)
+
+    def test_post_message(self):
+        pika_mock = self._mock_pika(None)
+        rabbitmq = RabbitMQClient('localhost', 5672, 'user', 'password', '/')
+        rabbitmq.post_message('exchange', 'key', 'message')
+
+        pika_mock.basic_publish.assert_called_once_with(body='message', exchange='exchange', routing_key='globomap.update.error.key')
 
     def _mock_pika(self, message):
         pika_mock = patch('rabbitmq.client.pika').start()

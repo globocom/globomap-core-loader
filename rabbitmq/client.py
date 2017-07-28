@@ -13,8 +13,8 @@ class RabbitMQClient(object):
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
 
-    def post_message(self, exchange_name):
-        pass
+    def post_message(self, exchange_name, key, message):
+        self.channel.basic_publish(exchange=exchange_name, routing_key='globomap.update.error.%s' % key, body=message)
 
     def read_messages(self, queue_name, number_messages=1):
         messages = []
