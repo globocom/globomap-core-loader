@@ -1,6 +1,7 @@
 import unittest
 from loader.globomap import GloboMapClient, GloboMapException
 from mock import patch, MagicMock
+from tests.util import open_json, as_json
 
 
 class TestGloboMapCllient(unittest.TestCase):
@@ -13,28 +14,29 @@ class TestGloboMapCllient(unittest.TestCase):
         patch.stopall()
 
     def test_create_element(self):
-        requests_mock = self._mock_request('{"id": 1}', 201)
+        requests_mock = self._mock_request({"id": 1}, 201)
 
-        payload = {'content': {'name': 'vip.test.com'}}
+        payload = open_json('tests/json/globomap/create_vip.json')
         self.assertIsNotNone(self.globomap_client.create('documents', 'vip', payload))
         requests_mock.request.assert_called_once_with('POST', 'http://localhost:8080/documents/vip/', data=payload)
 
     def test_create_element_expect_exception(self):
         with self.assertRaises(GloboMapException):
-            self._mock_request('{"id": 1}', 500)
+            self._mock_request({"id": 1}, 500)
             self.globomap_client.create('documents', 'vip', {'name': 'vip.test.com'})
 
     def test_update_element(self):
-        requests_mock = self._mock_request('{"id": 1, "name": "vip.test.com"}', 200)
+        requests_mock = self._mock_request(as_json({"id": 1, "name": "vip.test.com"}), 200)
 
-        payload = {'content': {'id': 1, 'name': 'vip.test.com'}}
+        payload = open_json('tests/json/globomap/create_vip.json')
         self.assertIsNotNone(self.globomap_client.update('documents', 'vip', 1, payload))
         requests_mock.request.assert_called_once_with('PUT', 'http://localhost:8080/documents/vip/1', data=payload)
 
     def test_update_element_expect_exception(self):
         with self.assertRaises(GloboMapException):
-            self._mock_request('{"id": 1}', 500)
-            self.globomap_client.update('documents', 'vip', 1, {'name': 'vip.test.com'})
+            self._mock_request({"id": 1}, 500)
+            payload = open_json('tests/json/globomap/create_vip.json')
+            self.globomap_client.update('documents', 'vip', 1, payload)
 
     def test_delete_element(self):
         requests_mock = self._mock_request(None, 200)
@@ -49,6 +51,6 @@ class TestGloboMapCllient(unittest.TestCase):
 
     def _mock_request(self, content, status=200):
         requests_mock = patch('loader.globomap.requests').start()
-        response_mock = MagicMock(status_code=status, content=content)
+        response_mock = MagicMock(status_code=status, content=as_json(content))
         requests_mock.request.return_value = response_mock
         return requests_mock
