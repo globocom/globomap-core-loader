@@ -1,0 +1,16 @@
+[
+  {
+    "action": "CREATE",
+    "collection": "vip",
+    "type": "documents" ,
+    "element": {
+    "content":
+      {
+        "id": "vip.test.com",
+        "name": "vip.test.com",
+        "provider": "globomap",
+        "timestamp": 1501448160
+      }
+    }
+  }
+]

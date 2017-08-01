@@ -66,7 +66,9 @@ class DriverWorker(Thread):
         for update in self.driver.updates():
             try:
                 update = update[0]
-                self.globomap_client.update_element_state(update['action'], update['type'], update['element'])
+                self.globomap_client.update_element_state(
+                    update['action'], update['type'], update['collection'], update['element']
+                )
             except GloboMapException:
                 self.log.exception("Error updating element %s" % update)
                 self.exception_handler.handle_exception(update)

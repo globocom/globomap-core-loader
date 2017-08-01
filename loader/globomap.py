@@ -10,29 +10,29 @@ class GloboMapClient(object):
     def __init__(self, host):
         self.host = host
 
-    def update_element_state(self, action, element_type, element):
+    def update_element_state(self, action, type, collection, element):
         if action.upper() == 'CREATE':
-            return self.create(element_type, element)
+            return self.create(type, collection, element)
         elif action.upper() == 'UPDATE':
-            return self.update(element_type, element['id'], element)
+            return self.update(collection, type, element['content']['id'], element)
         elif action.upper() == 'DELETE':
-            return self.delete(element_type, element['id'])
+            return self.delete(collection, type, element['content']['id'])
 
-    def create(self, element_type, payload):
-        return self._make_request('POST', self._build_uri(element_type), payload)
+    def create(self, type, collection, payload):
+        return self._make_request('POST', self._build_uri(type, collection), payload)
 
-    def update(self, element_type, id, payload):
-        return self._make_request('PUT', self._build_uri(element_type, id), payload)
+    def update(self, type, collection, id, payload):
+        return self._make_request('PUT', self._build_uri(type, collection, id), payload)
 
-    def delete(self, element_type, id):
-        return self._make_request('DELETE', self._build_uri(element_type, id))
+    def delete(self, type, collection, id):
+        return self._make_request('DELETE', self._build_uri(type, collection, id))
 
-    def list(self, element_type, ids=None):
+    def list(self, type, collection, ids=None):
         ids = ids if ids else []
-        return self._make_request('GET', self._build_uri(element_type, ';'.join(ids)))
+        return self._make_request('GET', self._build_uri(type, collection, ';'.join(ids)))
 
-    def get(self, element_type, id):
-        elements = self.list(element_type, [id])
+    def get(self, collection, id):
+        elements = self.list(collection, [id])
         if elements:
             return elements[0]
 
@@ -53,8 +53,8 @@ class GloboMapClient(object):
         if response:
             return json.loads(response)
 
-    def _build_uri(self, element_type, id=None):
-        return '/%s/%s' % (element_type, id or '')
+    def _build_uri(self, type, collection, id=None):
+        return '/%s/%s/%s' % (type, collection, id or '')
 
 
 class GloboMapException(Exception):

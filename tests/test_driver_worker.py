@@ -1,13 +1,14 @@
 from mock import MagicMock, Mock
 from loader.globomap import GloboMapException
 from loader.loader import DriverWorker
+from tests.util import open_json
 import unittest
 
 
 class TestDriverWorker(unittest.TestCase):
 
     def test_sync_updates(self):
-        updates = [{'action': 'CREATE', 'type': 'vip', 'element': {'name': 'vip.test.com'}}]
+        updates = open_json('tests/json/driver/driver_output_create.json')
         driver_mock = self._mock_driver(updates)
         globomap_client_mock = MagicMock()
 
@@ -15,10 +16,10 @@ class TestDriverWorker(unittest.TestCase):
         worker._sync_updates()
 
         driver_mock.updates.assert_called_once_with()
-        globomap_client_mock.update_element_state.assert_called_once_with('CREATE', 'vip', {'name': 'vip.test.com'})
+        globomap_client_mock.update_element_state.assert_called_once_with('CREATE', 'documents', 'vip', updates[0]['element'])
 
     def test_sync_updates_expected_exception(self):
-        updates = [{'action': 'CREATE', 'type': 'vip', 'element': {'name': 'vip.test.com'}}]
+        updates = open_json('tests/json/driver/driver_output_create.json')
         driver_mock = self._mock_driver(updates)
         globomap_client_mock = self._mock_globomap_client(GloboMapException())
         exception_handler = MagicMock()
@@ -27,7 +28,7 @@ class TestDriverWorker(unittest.TestCase):
         worker._sync_updates()
 
         driver_mock.updates.assert_called_once_with()
-        globomap_client_mock.update_element_state.assert_called_once_with('CREATE', 'vip', {'name': 'vip.test.com'})
+        globomap_client_mock.update_element_state.assert_called_once_with('CREATE', 'documents', 'vip', updates[0]['element'])
         exception_handler.handle_exception.assert_called_once_with(updates[0])
 
     def _mock_driver(self, return_value):
