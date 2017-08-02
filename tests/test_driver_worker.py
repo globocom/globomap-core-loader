@@ -33,7 +33,9 @@ class TestDriverWorker(unittest.TestCase):
 
     def _mock_driver(self, return_value):
         driver_mock = Mock()
-        driver_mock.updates.return_value = [return_value]
+        generator_mock = Mock()
+        generator_mock.__iter__ = Mock(return_value = iter([return_value]))
+        driver_mock.updates.return_value = generator_mock
         return driver_mock
 
     def _mock_globomap_client(self, exception):

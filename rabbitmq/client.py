@@ -26,10 +26,11 @@ class RabbitMQClient(object):
                     yield messages
                 break
             else:
-                messages.append(message)
-                if len(messages) == number_messages:
-                    yield messages
-                    messages = []
+                if message:
+                    messages.append(message)
+                    if len(messages) == number_messages:
+                        yield messages
+                        messages = []
 
     def get_message(self, queue_name):
         if not queue_name:

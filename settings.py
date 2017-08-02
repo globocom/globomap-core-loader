@@ -10,6 +10,6 @@ GLOBOMAP_RMQ_QUEUE_NAME = os.getenv('GLOBOMAP_RMQ_QUEUE_NAME')
 GLOBOMAP_RMQ_ERROR_EXCHANGE = os.getenv('GLOBOMAP_RMQ_ERROR_EXCHANGE')
 
 DRIVERS = [
-    # {'package': 'globomap_driver_napi.driver','class': 'Napi'},
-    {'package': 'driver.generic','class': 'GenericDriver'},
+    {'package': 'globomap_driver_napi.driver', 'class': 'Napi'},
+    {'package': 'driver.generic', 'class': 'GenericDriver'},
 ]

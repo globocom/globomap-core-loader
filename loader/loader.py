@@ -8,7 +8,6 @@ from settings import GLOBOMAP_API_ADDRESS, DRIVERS, GLOBOMAP_RMQ_USER, GLOBOMAP_
     GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_VIRTUAL_HOST, GLOBOMAP_RMQ_ERROR_EXCHANGE
 
 
-
 class CoreLoader(object):
 
     log = logging.getLogger(__name__)
@@ -63,17 +62,18 @@ class DriverWorker(Thread):
                 self.log.exception("Error syncing updates from driver %s" % self.driver)
 
     def _sync_updates(self):
-        for update in self.driver.updates():
-            try:
-                update = update[0]
-                self.globomap_client.update_element_state(
-                    update['action'], update['type'], update['collection'], update['element']
-                )
-            except GloboMapException:
-                self.log.exception("Error updating element %s" % update)
-                self.exception_handler.handle_exception(update)
-            except Exception:
-                self.exception_handler.handle_exception(update)
+        for updates in self.driver.updates():
+            for update in updates:
+                try:
+                    self.globomap_client.update_element_state(
+                        update['action'], update['type'], update['collection'], update['element']
+                    )
+                except GloboMapException:
+                    self.log.exception("Error calling globo Map API %s" % update)
+                    self.exception_handler.handle_exception(update)
+                except Exception:
+                    self.log.exception("Unknown error updating element %s" % update)
+                    self.exception_handler.handle_exception(update)
 
 
 class UpdateExceptionHandler(object):

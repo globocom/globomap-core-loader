@@ -17,4 +17,4 @@ class GenericDriver(object):
 
     def updates(self, number_messages=1):
         self.log.debug("Reading %s updates" % number_messages)
-        return self.rabbit_mq.read_messages(GLOBOMAP_RMQ_QUEUE_NAME, number_messages)
+        yield self.rabbit_mq.read_messages(GLOBOMAP_RMQ_QUEUE_NAME, number_messages).next()
