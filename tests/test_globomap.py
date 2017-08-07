@@ -38,6 +38,19 @@ class TestGloboMapCllient(unittest.TestCase):
             payload = open_json('tests/json/globomap/create_vip.json')
             self.globomap_client.update('collections', 'vip', 1, payload)
 
+    def test_patch_element(self):
+        payload = open_json('tests/json/globomap/update_vip.json')
+        requests_mock = self._mock_request(as_json(payload), 200)
+
+        self.assertIsNotNone(self.globomap_client.patch('collections', 'vip', "globomap_vip.test.com", payload))
+        requests_mock.request.assert_called_once_with('PATCH', 'http://localhost:8080/collections/vip/globomap_vip.test.com', data=payload)
+
+    def test_patch_element_expect_exception(self):
+        with self.assertRaises(GloboMapException):
+            self._mock_request({"id": 1}, 500)
+            payload = open_json('tests/json/globomap/create_vip.json')
+            self.globomap_client.patch('collections', 'vip', 1, payload)
+
     def test_delete_element(self):
         requests_mock = self._mock_request(None, 200)
 
