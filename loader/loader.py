@@ -43,6 +43,8 @@ class CoreLoader(object):
                 self.log.exception("Cannot load driver %s" % driver_class)
             except ImportError:
                 self.log.exception("Cannot load driver %s" % driver_class)
+            except Exception:
+                self.log.exception("Unknown error loading driver")
 
         return drivers
 
