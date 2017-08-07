@@ -1,8 +1,8 @@
 import logging
-
 from loader.rabbitmq import RabbitMQClient
-from loader.settings import GLOBOMAP_RMQ_USER, GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_HOST, \
-    GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_VIRTUAL_HOST, GLOBOMAP_RMQ_QUEUE_NAME
+from loader.settings import GLOBOMAP_RMQ_USER, GLOBOMAP_RMQ_PASSWORD,\
+    GLOBOMAP_RMQ_HOST, GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_VIRTUAL_HOST,\
+    GLOBOMAP_RMQ_QUEUE_NAME
 
 
 class GenericDriver(object):
@@ -17,4 +17,6 @@ class GenericDriver(object):
 
     def updates(self, number_messages=1):
         self.log.debug("Reading %s updates" % number_messages)
-        yield self.rabbit_mq.read_messages(GLOBOMAP_RMQ_QUEUE_NAME, number_messages).next()
+        yield self.rabbit_mq.read_messages(
+            GLOBOMAP_RMQ_QUEUE_NAME, number_messages
+        ).next()

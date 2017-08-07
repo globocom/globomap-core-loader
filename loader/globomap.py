@@ -19,17 +19,25 @@ class GloboMapClient(object):
             return self.delete(collection, type, element['key'])
 
     def create(self, type, collection, payload):
-        return self._make_request('POST', self._build_uri(type, collection), payload)
+        return self._make_request(
+            'POST', self._build_uri(type, collection), payload
+        )
 
     def update(self, type, collection, key, payload):
-        return self._make_request('PUT', self._build_uri(type, collection, key), payload)
+        return self._make_request(
+            'PUT', self._build_uri(type, collection, key), payload
+        )
 
     def delete(self, type, collection, key):
-        return self._make_request('DELETE', self._build_uri(type, collection, key))
+        return self._make_request(
+            'DELETE', self._build_uri(type, collection, key)
+        )
 
     def list(self, type, collection, keys=None):
         keys = keys if keys else []
-        return self._make_request('GET', self._build_uri(type, collection, ';'.join(keys)))
+        return self._make_request(
+            'GET', self._build_uri(type, collection, ';'.join(keys))
+        )
 
     def get(self, collection, key):
         elements = self.list(collection, [key])
@@ -44,7 +52,10 @@ class GloboMapClient(object):
         status = response.status_code
         content = response.content
 
-        self.log.debug("[GloboMap][response] %s - %s %s \n%s" % (method, request_url, status, content))
+        self.log.debug(
+            "[GloboMap][response] %s - %s %s \n%s" %
+            (method, request_url, status, content)
+        )
         if status >= 400:
             raise GloboMapException(self._parse_response(content))
         return self._parse_response(content)
