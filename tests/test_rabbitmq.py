@@ -1,8 +1,6 @@
 import unittest
-
 from mock import patch, MagicMock
-
-from rabbitmq.client import RabbitMQClient
+from loader.rabbitmq import RabbitMQClient
 
 
 class TestRabbitMQClient(unittest.TestCase):
@@ -36,7 +34,7 @@ class TestRabbitMQClient(unittest.TestCase):
         pika_mock.basic_publish.assert_called_once_with(body='message', exchange='exchange', routing_key='globomap.update.error.key')
 
     def _mock_pika(self, message):
-        pika_mock = patch('rabbitmq.client.pika').start()
+        pika_mock = patch('loader.rabbitmq.pika').start()
         pika_mock.ConnectionParameters.return_value = MagicMock()
         connection_mock = MagicMock()
         channel_mock = MagicMock()

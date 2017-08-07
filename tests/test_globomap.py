@@ -14,40 +14,40 @@ class TestGloboMapCllient(unittest.TestCase):
         patch.stopall()
 
     def test_create_element(self):
-        requests_mock = self._mock_request({"id": 1}, 201)
+        requests_mock = self._mock_request({"key": "globomap_key"}, 201)
 
         payload = open_json('tests/json/globomap/create_vip.json')
-        self.assertIsNotNone(self.globomap_client.create('documents', 'vip', payload))
-        requests_mock.request.assert_called_once_with('POST', 'http://localhost:8080/documents/vip/', data=payload)
+        self.assertIsNotNone(self.globomap_client.create('collections', 'vip', payload))
+        requests_mock.request.assert_called_once_with('POST', 'http://localhost:8080/collections/vip/', data=payload)
 
     def test_create_element_expect_exception(self):
         with self.assertRaises(GloboMapException):
             self._mock_request({"id": 1}, 500)
-            self.globomap_client.create('documents', 'vip', {'name': 'vip.test.com'})
+            self.globomap_client.create('collections', 'vip', {'name': 'vip.test.com'})
 
     def test_update_element(self):
-        requests_mock = self._mock_request(as_json({"id": 1, "name": "vip.test.com"}), 200)
+        payload = open_json('tests/json/globomap/update_vip.json')
+        requests_mock = self._mock_request(as_json(payload), 200)
 
-        payload = open_json('tests/json/globomap/create_vip.json')
-        self.assertIsNotNone(self.globomap_client.update('documents', 'vip', 1, payload))
-        requests_mock.request.assert_called_once_with('PUT', 'http://localhost:8080/documents/vip/1', data=payload)
+        self.assertIsNotNone(self.globomap_client.update('collections', 'vip', "globomap_vip.test.com", payload))
+        requests_mock.request.assert_called_once_with('PUT', 'http://localhost:8080/collections/vip/globomap_vip.test.com', data=payload)
 
     def test_update_element_expect_exception(self):
         with self.assertRaises(GloboMapException):
             self._mock_request({"id": 1}, 500)
             payload = open_json('tests/json/globomap/create_vip.json')
-            self.globomap_client.update('documents', 'vip', 1, payload)
+            self.globomap_client.update('collections', 'vip', 1, payload)
 
     def test_delete_element(self):
         requests_mock = self._mock_request(None, 200)
 
-        self.assertIsNone(self.globomap_client.delete('documents', 'vip', 1))
-        requests_mock.request.assert_called_once_with('DELETE', 'http://localhost:8080/documents/vip/1', data=None)
+        self.assertIsNone(self.globomap_client.delete('collections', 'vip', 'globomap_vip.test.com'))
+        requests_mock.request.assert_called_once_with('DELETE', 'http://localhost:8080/collections/vip/globomap_vip.test.com', data=None)
 
     def test_delete_element_expect_exception(self):
         with self.assertRaises(GloboMapException):
             self._mock_request(None, 500)
-            self.globomap_client.delete('documents', 'vip', 1)
+            self.globomap_client.delete('collections', 'vip', 'globomap_vip.test.com')
 
     def _mock_request(self, content, status=200):
         requests_mock = patch('loader.globomap.requests').start()

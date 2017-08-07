@@ -1,11 +1,14 @@
 import importlib
 import json
 import logging
+import time
 from threading import Thread
 from globomap import GloboMapClient, GloboMapException
-from rabbitmq.client import RabbitMQClient
-from settings import GLOBOMAP_API_ADDRESS, DRIVERS, GLOBOMAP_RMQ_USER, GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_HOST, \
-    GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_VIRTUAL_HOST, GLOBOMAP_RMQ_ERROR_EXCHANGE
+from settings import GLOBOMAP_API_ADDRESS, DRIVERS, GLOBOMAP_RMQ_USER, \
+    GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_HOST, GLOBOMAP_RMQ_PORT, \
+    GLOBOMAP_RMQ_VIRTUAL_HOST, GLOBOMAP_RMQ_ERROR_EXCHANGE, \
+    DRIVER_NUMBER_OF_UPDATES, DRIVER_FETCH_INTERVAL
+from rabbitmq import RabbitMQClient
 
 
 class CoreLoader(object):
@@ -36,9 +39,9 @@ class CoreLoader(object):
                 drivers.append(driver_type())
                 self.log.info("Driver '%s' loaded" % driver_class)
             except AttributeError:
-                self.log.error("Cannot load driver '%s' attribute not found" % driver_class)
+                self.log.exception("Cannot load driver '%s' attribute not found" % driver_class)
             except ImportError:
-                self.log.error("Cannot load driver '%s'. Module not found %s" % (driver_class, package))
+                self.log.exception("Cannot load driver '%s'. Module not found %s" % (driver_class, package))
 
         return drivers
 
@@ -60,20 +63,26 @@ class DriverWorker(Thread):
                 self._sync_updates()
             except Exception:
                 self.log.exception("Error syncing updates from driver %s" % self.driver)
+            finally:
+                time.sleep(DRIVER_FETCH_INTERVAL)
 
     def _sync_updates(self):
-        for updates in self.driver.updates():
-            for update in updates:
-                try:
-                    self.globomap_client.update_element_state(
-                        update['action'], update['type'], update['collection'], update['element']
-                    )
-                except GloboMapException:
-                    self.log.exception("Error calling globo Map API %s" % update)
-                    self.exception_handler.handle_exception(update)
-                except Exception:
-                    self.log.exception("Unknown error updating element %s" % update)
-                    self.exception_handler.handle_exception(update)
+        for updates in self.driver.updates(DRIVER_NUMBER_OF_UPDATES):
+            if updates:
+                for update in updates:
+                    try:
+                        self.globomap_client.update_element_state(
+                            update['action'], update['type'], update['collection'], update['element']
+                        )
+                    except GloboMapException:
+                        self.log.error("Error calling globo Map API %s" % update)
+                        self.exception_handler.handle_exception(update)
+                    except Exception:
+                        self.log.exception("Unknown error updating element %s" % update)
+                        self.exception_handler.handle_exception(update)
+            else:
+                self.log.debug("No updates found, sleeping for %s secods" % DRIVER_FETCH_INTERVAL)
+                time.sleep(DRIVER_FETCH_INTERVAL)
 
 
 class UpdateExceptionHandler(object):

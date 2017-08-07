@@ -2,15 +2,12 @@
   {
     "action": "CREATE",
     "collection": "vip",
-    "type": "documents" ,
+    "type": "collections" ,
     "element": {
-    "content":
-      {
-        "id": "vip.test.com",
-        "name": "vip.test.com",
-        "provider": "globomap",
-        "timestamp": 1501448160
-      }
+      "id": "vip.test.com",
+      "name": "vip.test.com",
+      "provider": "globomap",
+      "timestamp": 1501448160
     }
   }
 ]
