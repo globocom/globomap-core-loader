@@ -80,36 +80,32 @@ class DriverWorker(Thread):
                     "Error syncing updates from driver %s" % self.driver
                 )
             finally:
+                self.log.debug("No updates found")
+                self.log.debug("Sleeping for %ss" % DRIVER_FETCH_INTERVAL)
                 time.sleep(DRIVER_FETCH_INTERVAL)
 
     def _sync_updates(self):
-        for updates in self.driver.updates(DRIVER_NUMBER_OF_UPDATES):
-            if updates:
-                for update in updates:
-                    try:
-                        self.globomap_client.update_element_state(
-                            update['action'],
-                            update['type'],
-                            update['collection'],
-                            update['element']
-                        )
-                    except GloboMapException:
-                        self.log.error("Error on globo Map API %s" % update)
-                        self.exception_handler.handle_exception(update)
-                    except Exception:
-                        self.log.exception(
-                            "Unknown error updating element %s" % update
-                        )
-                        self.exception_handler.handle_exception(update)
-            else:
-                self.log.debug(
-                    "No updates found, sleeping for %s seconds" %
-                    DRIVER_FETCH_INTERVAL
+        for update in self.driver.updates(DRIVER_NUMBER_OF_UPDATES):
+            try:
+                self.globomap_client.update_element_state(
+                    update['action'],
+                    update['type'],
+                    update['collection'],
+                    update['element']
                 )
-                time.sleep(DRIVER_FETCH_INTERVAL)
+            except GloboMapException:
+                self.log.error("Error on globo Map API %s" % update)
+                self.exception_handler.handle_exception(update)
+            except Exception:
+                self.log.exception(
+                    "Unknown error updating element %s" % update
+                )
+                self.exception_handler.handle_exception(update)
 
 
 class UpdateExceptionHandler(object):
+
+    log = logging.getLogger(__name__)
 
     def __init__(self):
         self.rabbit_mq = RabbitMQClient(
@@ -118,6 +114,9 @@ class UpdateExceptionHandler(object):
         )
 
     def handle_exception(self, update):
-        self.rabbit_mq.post_message(
-            GLOBOMAP_RMQ_ERROR_EXCHANGE, update['type'], json.dumps(update)
-        )
+        try:
+            self.rabbit_mq.post_message(
+                GLOBOMAP_RMQ_ERROR_EXCHANGE, update['type'], json.dumps(update)
+            )
+        except:
+            self.log.exception("Unable to handle exception")

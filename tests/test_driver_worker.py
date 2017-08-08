@@ -16,7 +16,9 @@ class TestDriverWorker(unittest.TestCase):
         worker._sync_updates()
 
         driver_mock.updates.assert_called_once_with(1)
-        globomap_client_mock.update_element_state.assert_called_once_with('CREATE', 'collections', 'vip', updates[0]['element'])
+        globomap_client_mock.update_element_state.assert_called_once_with(
+            'CREATE', 'collections', 'vip', updates[0]['element']
+        )
 
     def test_sync_updates_expected_exception(self):
         updates = open_json('tests/json/driver/driver_output_create.json')
@@ -28,17 +30,17 @@ class TestDriverWorker(unittest.TestCase):
         worker._sync_updates()
 
         driver_mock.updates.assert_called_once_with(1)
-        globomap_client_mock.update_element_state.assert_called_once_with('CREATE', 'collections', 'vip', updates[0]['element'])
+        globomap_client_mock.update_element_state.assert_called_once_with(
+            'CREATE', 'collections', 'vip', updates[0]['element']
+        )
         exception_handler.handle_exception.assert_called_once_with(updates[0])
 
     def _mock_driver(self, return_value):
         driver_mock = Mock()
-        generator_mock = Mock()
-        generator_mock.__iter__ = Mock(return_value = iter([return_value]))
-        driver_mock.updates.return_value = generator_mock
+        driver_mock.updates.return_value = return_value
         return driver_mock
 
     def _mock_globomap_client(self, exception):
-        driver_mock = Mock()
-        driver_mock.update_element_state.side_effect = exception
-        return driver_mock
+        globomap_mock = Mock()
+        globomap_mock.update_element_state.side_effect = exception
+        return globomap_mock

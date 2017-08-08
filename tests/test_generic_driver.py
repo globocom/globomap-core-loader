@@ -8,13 +8,12 @@ class TestGenericDriver(unittest.TestCase):
 
     def test_get_updates_returning_empty_updates(self):
         self._mock_rabbitmq_client([])
-        updates = next(GenericDriver().updates())
-        self.assertEqual([], updates)
+        self.assertEqual([], GenericDriver().updates())
 
     def test_get_updates_returning_list_of_updates(self):
         updates = [open_json('tests/json/globomap/create_vip.json')]
         self._mock_rabbitmq_client(updates)
-        self.assertEqual(updates, next(GenericDriver().updates()))
+        self.assertEqual(updates, GenericDriver().updates())
 
     def _mock_rabbitmq_client(self, messages):
         rabbit_mq_mock = patch("driver.generic.RabbitMQClient").start()
