@@ -80,27 +80,32 @@ class DriverWorker(Thread):
                     "Error syncing updates from driver %s" % self.driver
                 )
             finally:
-                self.log.debug("No updates found")
+                self.log.debug("No more updates found")
                 self.log.debug("Sleeping for %ss" % DRIVER_FETCH_INTERVAL)
                 time.sleep(DRIVER_FETCH_INTERVAL)
 
     def _sync_updates(self):
-        for update in self.driver.updates(DRIVER_NUMBER_OF_UPDATES):
-            try:
-                self.globomap_client.update_element_state(
-                    update['action'],
-                    update['type'],
-                    update['collection'],
-                    update['element']
-                )
-            except GloboMapException:
-                self.log.error("Error on globo Map API %s" % update)
-                self.exception_handler.handle_exception(update)
-            except Exception:
-                self.log.exception(
-                    "Unknown error updating element %s" % update
-                )
-                self.exception_handler.handle_exception(update)
+        while True:
+            updates = self.driver.updates(DRIVER_NUMBER_OF_UPDATES)
+            if not updates:
+                break
+
+            for update in updates:
+                try:
+                    self.globomap_client.update_element_state(
+                        update['action'],
+                        update['type'],
+                        update['collection'],
+                        update['element']
+                    )
+                except GloboMapException:
+                    self.log.error("Error on globo Map API %s" % update)
+                    self.exception_handler.handle_exception(update)
+                except Exception:
+                    self.log.exception(
+                        "Unknown error updating element %s" % update
+                    )
+                    self.exception_handler.handle_exception(update)
 
 
 class UpdateExceptionHandler(object):
@@ -115,8 +120,12 @@ class UpdateExceptionHandler(object):
 
     def handle_exception(self, update):
         try:
+            self.log.debug("Sending failing update to rabbitmq")
+
             self.rabbit_mq.post_message(
-                GLOBOMAP_RMQ_ERROR_EXCHANGE, update['type'], json.dumps(update)
+                GLOBOMAP_RMQ_ERROR_EXCHANGE,
+                'globomap.update.error.%s' % update['collection'],
+                json.dumps(update)
             )
         except:
             self.log.exception("Unable to handle exception")

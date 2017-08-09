@@ -13,15 +13,16 @@ Drivers:
 ## Environment variables configuration
 All of the environment variables below must be set for the application to work properly.
 
-| Variable                    | Description                                                       | Example                      |
-|-----------------------------|-------------------------------------------------------------------|------------------------------|
-| DRIVER_FETCH_INTERVAL       | Interval in seconds on which the updates are fetched from a driver| 30 (default)                 |
-| DRIVER_NUMBER_OF_UPDATES    | Number of updates that are fetched from the driver on each interval| 1 (default)              |
-| GLOBOMAP_API_ADDRESS        | Globo MAP API address                                             | http://globomap.domain.com   |
-| GLOBOMAP_RMQ_HOST           | Globo MAP RabbitMQ host                                           | rabbitmq.yourdomain.com      |
-| GLOBOMAP_RMQ_PORT           | Globo MAP RabbitMQ port                                           | 5672 (default)               |
-| GLOBOMAP_RMQ_USER           | Globo MAP RabbitMQ user                                           | user-name                    |
-| GLOBOMAP_RMQ_PASSWORD       | Globo MAP RabbitMQ password                                       | password                     |
-| GLOBOMAP_RMQ_VIRTUAL_HOST   | Globo MAP RabbitMQ virtual host                                   | /globomap                    |
-| GLOBOMAP_RMQ_QUEUE_NAME     | Globo MAP RabbitMQ queue name                                     | globomap-events              |
-| GLOBOMAP_RMQ_ERROR_EXCHANGE | Globo MAP RabbitMQ error exchange name                            | globomap-errors              |
+| Variable                    | Description                                                        | Example                      |
+|-----------------------------|--------------------------------------------------------------------|------------------------------|
+| DRIVER_FETCH_INTERVAL       | Interval in seconds on which the updates are fetched from a driver | 60 (default)                 |
+| DRIVER_NUMBER_OF_UPDATES    | Number of updates that are fetched from the driver on each interval| 1 (default)                  |
+| GLOBOMAP_API_ADDRESS        | Globo Map API address                                              | http://globomap.domain.com   |
+| GLOBOMAP_RMQ_HOST           | RabbitMQ host                                                      | rabbitmq.yourdomain.com      |
+| GLOBOMAP_RMQ_PORT           | RabbitMQ port                                                      | 5672 (default)               |
+| GLOBOMAP_RMQ_USER           | RabbitMQ user                                                      | user-name                    |
+| GLOBOMAP_RMQ_PASSWORD       | RabbitMQ password                                                  | password                     |
+| GLOBOMAP_RMQ_VIRTUAL_HOST   | RabbitMQ virtual host                                              | /globomap                    |
+| GLOBOMAP_RMQ_QUEUE_NAME     | RabbitMQ queue name                                                | globomap-updates             |
+| GLOBOMAP_RMQ_EXCHANGE       | RabbitMQ updates exchange name                                     | globomap-updates-exchange    |
+| GLOBOMAP_RMQ_ERROR_EXCHANGE | RabbitMQ error exchange name                                       | globomap-errors-exchange     |

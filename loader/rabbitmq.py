@@ -14,9 +14,9 @@ class RabbitMQClient(object):
         self.channel = self.connection.channel()
 
     def post_message(self, exchange_name, key, message):
-        self.channel.basic_publish(
+        return self.channel.basic_publish(
             exchange=exchange_name,
-            routing_key='globomap.update.error.%s' % key,
+            routing_key=key,
             body=message
         )
 

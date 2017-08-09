@@ -15,7 +15,7 @@ class TestDriverWorker(unittest.TestCase):
         worker = DriverWorker(globomap_client_mock, driver_mock, None)
         worker._sync_updates()
 
-        driver_mock.updates.assert_called_once_with(1)
+        self.assertEqual(2, driver_mock.updates.call_count)
         globomap_client_mock.update_element_state.assert_called_once_with(
             'CREATE', 'collections', 'vip', updates[0]['element']
         )
@@ -29,7 +29,7 @@ class TestDriverWorker(unittest.TestCase):
         worker = DriverWorker(globomap_client_mock, driver_mock, exception_handler)
         worker._sync_updates()
 
-        driver_mock.updates.assert_called_once_with(1)
+        self.assertEqual(2, driver_mock.updates.call_count)
         globomap_client_mock.update_element_state.assert_called_once_with(
             'CREATE', 'collections', 'vip', updates[0]['element']
         )
@@ -37,7 +37,7 @@ class TestDriverWorker(unittest.TestCase):
 
     def _mock_driver(self, return_value):
         driver_mock = Mock()
-        driver_mock.updates.return_value = return_value
+        driver_mock.updates.side_effect = [return_value, []]
         return driver_mock
 
     def _mock_globomap_client(self, exception):
