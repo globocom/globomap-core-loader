@@ -35,7 +35,7 @@ class CoreLoader(object):
             driver_class = driver_config['class']
             try:
                 driver_instance = self._create_driver_instance(
-                    driver_class, package
+                    driver_class, package, driver_config['params']
                 )
                 drivers.append(driver_instance)
                 self.log.info("Driver '%s' loaded" % driver_class)
@@ -44,11 +44,13 @@ class CoreLoader(object):
             except ImportError:
                 self.log.exception("Cannot load driver %s" % driver_class)
             except Exception:
-                self.log.exception("Unknown error loading driver")
+                self.log.exception(
+                    "Unknown error loading driver %s" % driver_config
+                )
 
         return drivers
 
-    def _create_driver_instance(self, driver_class, package):
+    def _create_driver_instance(self, driver_class, package, params):
         driver_type = getattr(importlib.import_module(package), driver_class)
         has_update_method = hasattr(driver_type, 'updates') and \
             callable(getattr(driver_type, 'updates'))
@@ -57,7 +59,11 @@ class CoreLoader(object):
             raise AttributeError(
                 "Driver '%s' does not implement 'updates'" % driver_class
             )
-        return driver_type()
+
+        if params:
+            return driver_type(params)
+        else:
+            return driver_type()
 
 
 class DriverWorker(Thread):
