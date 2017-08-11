@@ -3,11 +3,20 @@ import json
 import logging
 import time
 from threading import Thread
-from globomap import GloboMapClient, GloboMapException
-from settings import GLOBOMAP_API_ADDRESS, DRIVERS, GLOBOMAP_RMQ_USER, \
-    GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_HOST, GLOBOMAP_RMQ_PORT, \
-    GLOBOMAP_RMQ_VIRTUAL_HOST, GLOBOMAP_RMQ_ERROR_EXCHANGE, \
-    DRIVER_NUMBER_OF_UPDATES, DRIVER_FETCH_INTERVAL
+
+from globomap import GloboMapClient
+from globomap import GloboMapException
+from settings import DRIVER_FETCH_INTERVAL
+from settings import DRIVER_NUMBER_OF_UPDATES
+from settings import DRIVERS
+from settings import GLOBOMAP_API_ADDRESS
+from settings import GLOBOMAP_RMQ_ERROR_EXCHANGE
+from settings import GLOBOMAP_RMQ_HOST
+from settings import GLOBOMAP_RMQ_PASSWORD
+from settings import GLOBOMAP_RMQ_PORT
+from settings import GLOBOMAP_RMQ_USER
+from settings import GLOBOMAP_RMQ_VIRTUAL_HOST
+
 from rabbitmq import RabbitMQClient
 
 
@@ -16,7 +25,7 @@ class CoreLoader(object):
     log = logging.getLogger(__name__)
 
     def __init__(self):
-        self.log.info("Starting Globmap loader")
+        self.log.info('Starting Globmap loader')
         self.drivers = self._load_drivers()
         self.globomap_client = GloboMapClient(GLOBOMAP_API_ADDRESS)
 
@@ -27,7 +36,7 @@ class CoreLoader(object):
             ).start()
 
     def _load_drivers(self):
-        self.log.info("Loading drivers: %s" % DRIVERS)
+        self.log.info('Loading drivers: %s' % DRIVERS)
 
         drivers = []
         for driver_config in DRIVERS:
@@ -35,17 +44,17 @@ class CoreLoader(object):
             driver_class = driver_config['class']
             try:
                 driver_instance = self._create_driver_instance(
-                    driver_class, package, driver_config['params']
+                    driver_class, package, driver_config.get('params')
                 )
                 drivers.append(driver_instance)
                 self.log.info("Driver '%s' loaded" % driver_class)
             except AttributeError:
-                self.log.exception("Cannot load driver %s" % driver_class)
+                self.log.exception('Cannot load driver %s' % driver_class)
             except ImportError:
-                self.log.exception("Cannot load driver %s" % driver_class)
+                self.log.exception('Cannot load driver %s' % driver_class)
             except Exception:
                 self.log.exception(
-                    "Unknown error loading driver %s" % driver_config
+                    'Unknown error loading driver %s' % driver_config
                 )
 
         return drivers
@@ -83,11 +92,11 @@ class DriverWorker(Thread):
                 self._sync_updates()
             except Exception:
                 self.log.exception(
-                    "Error syncing updates from driver %s" % self.driver
+                    'Error syncing updates from driver %s' % self.driver
                 )
             finally:
-                self.log.debug("No more updates found")
-                self.log.debug("Sleeping for %ss" % DRIVER_FETCH_INTERVAL)
+                self.log.debug('No more updates found')
+                self.log.debug('Sleeping for %ss' % DRIVER_FETCH_INTERVAL)
                 time.sleep(DRIVER_FETCH_INTERVAL)
 
     def _sync_updates(self):
@@ -105,11 +114,11 @@ class DriverWorker(Thread):
                         update['element']
                     )
                 except GloboMapException:
-                    self.log.error("Error on globo Map API %s" % update)
+                    self.log.error('Error on globo Map API %s' % update)
                     self.exception_handler.handle_exception(update)
                 except Exception:
                     self.log.exception(
-                        "Unknown error updating element %s" % update
+                        'Unknown error updating element %s' % update
                     )
                     self.exception_handler.handle_exception(update)
 
@@ -126,7 +135,7 @@ class UpdateExceptionHandler(object):
 
     def handle_exception(self, update):
         try:
-            self.log.debug("Sending failing update to rabbitmq")
+            self.log.debug('Sending failing update to rabbitmq')
 
             self.rabbit_mq.post_message(
                 GLOBOMAP_RMQ_ERROR_EXCHANGE,
@@ -134,4 +143,4 @@ class UpdateExceptionHandler(object):
                 json.dumps(update)
             )
         except:
-            self.log.exception("Unable to handle exception")
+            self.log.exception('Unable to handle exception')
