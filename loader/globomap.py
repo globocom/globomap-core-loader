@@ -54,7 +54,7 @@ class GloboMapClient(object):
     def _make_request(self, method, uri, data=None):
         request_url = "%s%s" % (self.host, uri)
         self.log.debug("[GloboMap][request] %s - %s" % (method, request_url))
-        response = requests.request(method, request_url, data=data)
+        response = requests.request(method, request_url, data=json.dumps(data))
 
         status = response.status_code
         content = response.content
