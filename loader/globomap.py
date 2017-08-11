@@ -14,11 +14,11 @@ class GloboMapClient(object):
         if action.upper() == 'CREATE':
             return self.create(type, collection, element)
         elif action.upper() == 'UPDATE':
-            return self.update(collection, type, element['key'], element)
+            return self.update(type, collection, element['key'], element)
         elif action.upper() == 'PATCH':
-            return self.patch(collection, type, element['key'], element)
+            return self.patch(type, collection, element['key'], element)
         elif action.upper() == 'DELETE':
-            return self.delete(collection, type, element['key'])
+            return self.delete(type, collection, element['key'])
 
     def create(self, type, collection, payload):
         return self._make_request(
