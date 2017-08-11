@@ -111,7 +111,8 @@ class DriverWorker(Thread):
                         update['action'],
                         update['type'],
                         update['collection'],
-                        update['element']
+                        update.get('element'),
+                        update.get('key'),
                     )
                 except GloboMapException:
                     self.log.error('Error on globo Map API %s' % update)

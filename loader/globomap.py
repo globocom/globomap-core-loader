@@ -10,15 +10,15 @@ class GloboMapClient(object):
     def __init__(self, host):
         self.host = host
 
-    def update_element_state(self, action, type, collection, element):
+    def update_element_state(self, action, type, collection, element, key):
         if action.upper() == 'CREATE':
             return self.create(type, collection, element)
         elif action.upper() == 'UPDATE':
-            return self.update(type, collection, element['key'], element)
+            return self.update(type, collection, key, element)
         elif action.upper() == 'PATCH':
-            return self.patch(type, collection, element['key'], element)
+            return self.patch(type, collection, key, element)
         elif action.upper() == 'DELETE':
-            return self.delete(type, collection, element['key'])
+            return self.delete(type, collection, key)
 
     def create(self, type, collection, payload):
         return self._make_request(
@@ -26,19 +26,28 @@ class GloboMapClient(object):
         )
 
     def update(self, type, collection, key, payload):
-        return self._make_request(
-            'PUT', self._build_uri(type, collection, key), payload
-        )
+        try:
+            return self._make_request(
+                'PUT', self._build_uri(type, collection, key), payload
+            )
+        except ElementNotFoundException:
+            return self.create(type, collection, payload)
 
     def patch(self, type, collection, key, payload):
-        return self._make_request(
-            'PATCH', self._build_uri(type, collection, key), payload
-        )
+        try:
+            return self._make_request(
+                'PATCH', self._build_uri(type, collection, key), payload
+            )
+        except ElementNotFoundException:
+            return self.create(type, collection, payload)
 
     def delete(self, type, collection, key):
-        return self._make_request(
-            'DELETE', self._build_uri(type, collection, key)
-        )
+        try:
+            return self._make_request(
+                'DELETE', self._build_uri(type, collection, key)
+            )
+        except ElementNotFoundException:
+            self.log.debug("Element %s already deleted" % key)
 
     def list(self, type, collection, keys=None):
         keys = keys if keys else []
@@ -63,8 +72,11 @@ class GloboMapClient(object):
             "[GloboMap][response] %s - %s %s \n%s" %
             (method, request_url, status, content)
         )
-        if status >= 400:
-            raise GloboMapException(self._parse_response(content))
+
+        if status == 404:
+            raise ElementNotFoundException()
+        elif status >= 400:
+            raise GloboMapException()
         return self._parse_response(content)
 
     def _parse_response(self, response):
@@ -76,4 +88,8 @@ class GloboMapClient(object):
 
 
 class GloboMapException(Exception):
+    pass
+
+
+class ElementNotFoundException(GloboMapException):
     pass

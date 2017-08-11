@@ -11,7 +11,7 @@ class TestGenericDriver(unittest.TestCase):
         self.assertEqual([], GenericDriver().updates())
 
     def test_get_updates_returning_list_of_updates(self):
-        updates = [open_json('tests/json/globomap/create_vip.json')]
+        updates = [open_json('tests/json/globomap/vip.json')]
         self._mock_rabbitmq_client(updates)
         self.assertEqual(updates, GenericDriver().updates())
 

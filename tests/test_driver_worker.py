@@ -17,7 +17,7 @@ class TestDriverWorker(unittest.TestCase):
 
         self.assertEqual(2, driver_mock.updates.call_count)
         globomap_client_mock.update_element_state.assert_called_once_with(
-            'CREATE', 'collections', 'vip', updates[0]['element']
+            'CREATE', 'collections', 'vip', updates[0]['element'], None
         )
 
     def test_sync_updates_expected_exception(self):
@@ -31,7 +31,7 @@ class TestDriverWorker(unittest.TestCase):
 
         self.assertEqual(2, driver_mock.updates.call_count)
         globomap_client_mock.update_element_state.assert_called_once_with(
-            'CREATE', 'collections', 'vip', updates[0]['element']
+            'CREATE', 'collections', 'vip', updates[0]['element'], None
         )
         exception_handler.handle_exception.assert_called_once_with(updates[0])
 
