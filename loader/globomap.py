@@ -1,5 +1,6 @@
 import json
 import logging
+
 import requests
 
 
@@ -47,7 +48,7 @@ class GloboMapClient(object):
                 'DELETE', self._build_uri(type, collection, key)
             )
         except ElementNotFoundException:
-            self.log.debug("Element %s already deleted" % key)
+            self.log.debug('Element %s already deleted' % key)
 
     def list(self, type, collection, keys=None):
         keys = keys if keys else []
@@ -61,15 +62,15 @@ class GloboMapClient(object):
             return elements[0]
 
     def _make_request(self, method, uri, data=None):
-        request_url = "%s%s" % (self.host, uri)
-        self.log.debug("[GloboMap][request] %s - %s" % (method, request_url))
+        request_url = '%s%s' % (self.host, uri)
+        self.log.debug('[GloboMap][request] %s - %s' % (method, request_url))
         response = requests.request(method, request_url, data=json.dumps(data))
 
         status = response.status_code
         content = response.content
 
         self.log.debug(
-            "[GloboMap][response] %s - %s %s \n%s" %
+            '[GloboMap][response] %s - %s %s \n%s' %
             (method, request_url, status, content)
         )
 
@@ -84,7 +85,10 @@ class GloboMapClient(object):
             return json.loads(response)
 
     def _build_uri(self, type, collection, key=None):
-        return '/%s/%s/%s' % (type, collection, key or '')
+        uri = '/%s/%s' % (type, collection)
+        uri += '/%s' % (key) if key else ''
+
+        return uri
 
 
 class GloboMapException(Exception):
