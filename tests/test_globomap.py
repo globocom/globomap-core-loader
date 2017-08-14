@@ -24,7 +24,7 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'POST',
-            'http://localhost:8080/collections/vip/',
+            'http://localhost:8080/collections/vip',
             payload
         )
 
@@ -39,7 +39,7 @@ class TestGloboMapCllient(unittest.TestCase):
             self._assert_request_called(
                 requests_mock,
                 'POST',
-                'http://localhost:8080/collections/vip/',
+                'http://localhost:8080/collections/vip',
                 payload
             )
 
@@ -73,7 +73,7 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'POST',
-            'http://localhost:8080/collections/vip/',
+            'http://localhost:8080/collections/vip',
             payload
         )
 
@@ -122,7 +122,7 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'POST',
-            'http://localhost:8080/collections/vip/',
+            'http://localhost:8080/collections/vip',
             payload
         )
 
