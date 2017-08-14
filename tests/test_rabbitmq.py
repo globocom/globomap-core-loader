@@ -31,7 +31,11 @@ class TestRabbitMQClient(unittest.TestCase):
         rabbitmq = RabbitMQClient('localhost', 5672, 'user', 'password', '/')
         rabbitmq.post_message('exchange', 'key', 'message')
 
-        pika_mock.basic_publish.assert_called_once_with(body='message', exchange='exchange', routing_key='key')
+        pika_mock.basic_publish.assert_called_once_with(
+            body='message', exchange='exchange',
+            routing_key='key',
+            mandatory=True
+        )
 
     def _mock_pika(self, message):
         pika_mock = patch('loader.rabbitmq.pika').start()

@@ -12,12 +12,14 @@ class RabbitMQClient(object):
         )
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
+        self.channel.confirm_delivery()
 
     def post_message(self, exchange_name, key, message):
         return self.channel.basic_publish(
             exchange=exchange_name,
             routing_key=key,
-            body=message
+            body=message,
+            mandatory=True
         )
 
     def read_messages(self, queue_name, number_messages=1):
