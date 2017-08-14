@@ -4,9 +4,14 @@ from flask import request, abort, jsonify
 from werkzeug.exceptions import BadRequest
 from api import api
 from loader.rabbitmq import RabbitMQClient
-from loader.settings import GLOBOMAP_RMQ_HOST, \
-    GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_USER, GLOBOMAP_RMQ_VIRTUAL_HOST, \
-    GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_EXCHANGE
+from loader.settings import GLOBOMAP_RMQ_HOST
+from loader.settings import GLOBOMAP_RMQ_PORT
+from loader.settings import GLOBOMAP_RMQ_USER
+from loader.settings import GLOBOMAP_RMQ_VIRTUAL_HOST
+from loader.settings import GLOBOMAP_RMQ_PASSWORD
+from loader.settings import GLOBOMAP_RMQ_EXCHANGE
+from loader.settings import GLOBOMAP_RMQ_KEY
+
 
 log = logging.getLogger(__name__)
 
@@ -19,8 +24,11 @@ def insert_updates():
         updates = request.get_json()
         for update in updates:
             event_published = rabbit_mq.post_message(
-                GLOBOMAP_RMQ_EXCHANGE, 'globomap.updates', json.dumps(update)
+                GLOBOMAP_RMQ_EXCHANGE,
+                GLOBOMAP_RMQ_KEY,
+                json.dumps(update)
             )
+
             if not event_published:
                 log.error("Error publishing update %s" % update)
                 return abort(400)
