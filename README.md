@@ -26,3 +26,4 @@ All of the environment variables below must be set for the application to work p
 | GLOBOMAP_RMQ_QUEUE_NAME     | RabbitMQ queue name                                                | globomap-updates             |
 | GLOBOMAP_RMQ_EXCHANGE       | RabbitMQ updates exchange name                                     | globomap-updates-exchange    |
 | GLOBOMAP_RMQ_ERROR_EXCHANGE | RabbitMQ error exchange name                                       | globomap-errors-exchange     |
+| GLOBOMAP_RMQ_BINDING_KEY    | RabbitMQ generic driver API binding key                            | globomap.updates (default)   |
