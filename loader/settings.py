@@ -25,6 +25,12 @@ DRIVERS = [
     {
         'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
         'params': {
+            'env': 'DEV'
+        }
+    },
+    {
+        'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
+        'params': {
             'env': 'CME'
         }
     }
