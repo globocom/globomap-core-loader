@@ -143,5 +143,5 @@ class UpdateExceptionHandler(object):
                 'globomap.update.error.%s' % update['collection'],
                 json.dumps(update)
             )
-        except:
-            self.log.exception('Unable to handle exception')
+        except Exception as err:
+            self.log.exception('Unable to handle exception %s', err)
