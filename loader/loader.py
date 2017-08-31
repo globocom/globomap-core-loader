@@ -3,6 +3,7 @@ import json
 import logging
 import time
 from threading import Thread
+from pika.exceptions import ConnectionClosed
 
 from globomap import GloboMapClient
 from globomap import GloboMapException
@@ -129,19 +130,27 @@ class UpdateExceptionHandler(object):
     log = logging.getLogger(__name__)
 
     def __init__(self):
+        self._connect_rabbit()
+
+    def _connect_rabbit(self):
         self.rabbit_mq = RabbitMQClient(
             GLOBOMAP_RMQ_HOST, GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_USER,
             GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_VIRTUAL_HOST
         )
 
-    def handle_exception(self, update):
+    def handle_exception(self, update, retry=True):
         try:
-            self.log.debug('Sending failing update to rabbitmq')
+            self.log.debug('Sending failing update to rabbitmq error queue')
 
             self.rabbit_mq.post_message(
                 GLOBOMAP_RMQ_ERROR_EXCHANGE,
-                'globomap.update.error.%s' % update['collection'],
+                'globomap.update.error.%s' % update.get('collection', '*'),
                 json.dumps(update)
             )
+        except ConnectionClosed:
+            if retry:
+                self.log.error("RabbitMQ Connection closed, reconnecting")
+                self._connect_rabbit()
+                self.handle_exception(update, False)
         except Exception as err:
             self.log.exception('Unable to handle exception %s', err)
