@@ -22,7 +22,8 @@ if __name__ == '__main__':
 
     logging.basicConfig(
         filename='globomap-loader.log',
-        level=logging.DEBUG,
+        level=logging.INFO,
         format='%(asctime)s %(threadName)s %(levelname)s %(message)s'
     )
+    logging.getLogger("requests").setLevel(logging.WARNING)
     CoreLoader().load()

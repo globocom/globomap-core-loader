@@ -78,22 +78,30 @@ class GloboMapClient(object):
 
     def _make_request(self, method, uri, data=None):
         request_url = '%s%s' % (self.host, uri)
-        self.log.debug('[GloboMap][request] %s - %s' % (method, request_url))
-        response = requests.request(method, request_url, data=json.dumps(data))
 
+        self._log_http('REQUEST', method, request_url, data)
+
+        response = requests.request(method, request_url, data=json.dumps(data))
         status = response.status_code
         content = response.content
 
-        self.log.debug(
-            '[GloboMap][response] %s - %s %s \n%s' %
-            (method, request_url, status, content)
-        )
+        self._log_http('RESPONSE', method, request_url, content, status)
 
         if status == 404:
             raise ElementNotFoundException()
         elif status >= 400:
             raise GloboMapException()
         return self._parse_response(content)
+
+    def _log_http(self, operation, method, url, content=None, status=''):
+        if self.log.isEnabledFor(logging.DEBUG):
+            self.log.debug(
+                '%s: %s %s %s %s' % (operation, method, url, status, content)
+            )
+        else:
+            self.log.info(
+                '%s: %s %s %s' % (operation, method, url, status)
+            )
 
     def _parse_response(self, response):
         if response:
