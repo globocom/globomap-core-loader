@@ -1,6 +1,7 @@
 # Publishing Updates
 
-Payload for Edges:
+### Payload for Edges:
+
 ```json
 {
  "action": "<action>",
@@ -30,7 +31,8 @@ Payload for Edges:
 }
 ```
 
-Payload for Collections
+### Payload for Collections
+
 ```json
 {
  "action": "<action>",
@@ -58,7 +60,7 @@ Payload for Collections
 }
 ```
 
-Common fields:
+### Common fields:
 
 | Field                           | Description                                                                                                                                                                                                                                                                                                                   |     
 |---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -76,14 +78,15 @@ Common fields:
 | **element/properties_metadata** | It's a dict, where keys are the additional properties, where the corresponding values are dictionaries where description is mandatory.                                                                                                                                                                                        |
 | **element/key**                 | Mandatory at UPDATE, PATCH and DELETE actions. At CREATE it is auto set by GloboMAP API.                                                                                                                                                                                                                                      |
 
-Specific for edges:
+### Specific for edges:
 
 | Field                         | Description
 |-------------------------------|-------------------------------------------------------------------|
 | **element/from**              | Identifier of the source document at collection/key database.     |
 | **element/to**                | Identifier of the destination document at collection/key database.|                                               
 
-Observation: 
+### Observation: 
+
 * A graph/layer is unique at database and also the name of collections. When documents are created the first time, **element/key** property is automatically set by GloboMAP API concatenating **element/provider** and **element/id** with underscore at middle. Therefore you can get a specific document using name of collection (**collection** property) where it is present plus **element/key** that was auto set for this particular document with a slash (/) at middle.
     * Example: For a collection named "coll" and document created into it with **element/provider**="napi" and **element/id**="2" the generated element/key property will be "napi_2". Since you can have documents in other collections with **element/key** property equals to "napi_2", you need an way to identify the "napi_2" document of "coll1" collection. GloboMAP API will understand "coll/napi_2" as this document.
 
