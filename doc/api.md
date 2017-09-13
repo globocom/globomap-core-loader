@@ -59,23 +59,27 @@ Payload for Collections
 ```
 
 Common fields:
-* action - It accepts PATCH, CREATE, UPDATE and DELETE
-    * PATCH - Updates only sent properties not affecting other existing properties
-    * CREATE - Create document inside collection/edge.
-    * UPDATE - Updates sent properties and remove other existing properties. If some property in payload does not exist, it will be created.
-    * DELETE - Delete document inside collection/edge.
-* collection - Specify the name of edge/collection that you want to insert documents.
-* element/id - Its an unique hash for the same provider of collecttion. Some drivers uses an internal control identifier, others uses a MD5 hash and others uses any string. It doesn't have right or wrong models, it will vary in about how each document links with anothers and how documents know each other.
-* element/name - String for a human identification of document.
-* element/provider - Provider is the name of who gives information. For example, the collection named "network" needs "napi" provider because it is the provider that is responsible of Insert, Update or Delete. However "comp_unit" collection needs "globomap" because it's a collection that many providers updates parts of the same document.
-* element/timestamp - It's the unix timestamp that says moment that data have to be updated. If you don't have this at your data structure, generate one at runtime.
-* element/properties - It's an optional field. It's a dict where keys are the additional properties, with corresponding values.
-* element/properties_metadata - It's a dict, where keys are the additional properties, where the corresponding values are dictionaries where description is mandatory.
-* element/key: Mandatory at UPDATE, PATCH and DELETE actions.
+| Field                         | Description                                                                                                                                                                                                                                                                                                                   |     
+|-------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| action                        |                                                                                                                                                                                                                                                                                                                               |
+| - PATCH                       | Updates only sent properties not affecting other existing properties.                                                                                                                                                                                                                                                         |
+| - CREATE                      | Create document inside collection/edge.                                                                                                                                                                                                                                                                                       |
+| - UPDATE                      | Updates sent properties and remove other existing properties. If some property in payload does not exist, it will be created.                                                                                                                                                                                                 |
+| - DELETE                      | Delete document inside collection/edge.                                                                                                                                                                                                                                                                                       |
+| collection                    | Specify the name of edge/collection that you want to insert documents.                                                                                                                                                                                                                                                        |
+| element/id                    | Its an unique hash for the same provider of collecttion. Some drivers uses an internal control identifier, others uses a MD5 hash and others uses any string. It doesn't have right or wrong models, it will vary in about how each document links with anothers and how documents know each other.                           |
+| element/name                  | String for a human identification of document.                                                                                                                                                                                                                                                                                |
+| element/provider              | Provider is the name of who gives information. For example, the collection named "network" needs "napi" provider because it is the provider that is responsible of Insert, Update or Delete. However "comp_unit" collection needs "globomap" because it's a collection that many providers updates parts of the same document.|
+| element/timestamp             | It's the unix timestamp that says moment that data have to be updated. If you don't have this at your data structure, generate one at runtime.                                                                                                                                                                                |
+| element/properties            | It's an optional field. It's a dict where keys are the additional properties, with corresponding values.                                                                                                                                                                                                                      |
+| element/properties_metadata   | It's a dict, where keys are the additional properties, where the corresponding values are dictionaries where description is mandatory.                                                                                                                                                                                        |
+| element/key                   | Mandatory at UPDATE, PATCH and DELETE actions. At CREATE it is auto set by GloboMAP API.                                                                                                                                                                                                                                      |
 
 Specific for edges:
-* element/from: Identifier of the source document at collection/key database
-* element/to: Identifier of the destination document at collection/key database.
+| Field                         | Description
+|-------------------------------|-------------------------------------------------------------------|
+| element/from                  | Identifier of the source document at collection/key database.     |
+| element/to                    | Identifier of the destination document at collection/key database.|                                               
 
 Observation: 
 * A graph/layer is unique at database and also the name of collections. When documents are created the first time, element/key property is automatically set by GloboMAP API concatenating element/provider and element/id with underscore at middle. Therefore you can get a specific document using name of collection (<b>collection</b> property) where it is present plus <b>element/key</b> that was auto set for this particular document with a slash (/) at middle.
