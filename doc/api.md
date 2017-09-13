@@ -59,6 +59,7 @@ Payload for Collections
 ```
 
 Common fields:
+
 | Field                         | Description                                                                                                                                                                                                                                                                                                                   |     
 |-------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | action                        |                                                                                                                                                                                                                                                                                                                               |
@@ -76,6 +77,7 @@ Common fields:
 | element/key                   | Mandatory at UPDATE, PATCH and DELETE actions. At CREATE it is auto set by GloboMAP API.                                                                                                                                                                                                                                      |
 
 Specific for edges:
+
 | Field                         | Description
 |-------------------------------|-------------------------------------------------------------------|
 | element/from                  | Identifier of the source document at collection/key database.     |
