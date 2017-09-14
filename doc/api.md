@@ -88,7 +88,7 @@
 ### Observation: 
 
 * A graph/layer is unique at database and also the name of collections. When documents are created the first time, **element/key** property is automatically set by GloboMAP API concatenating **element/provider** and **element/id** with underscore at middle. Therefore you can get a specific document using name of collection (**collection** property) where it is present plus **element/key** that was auto set for this particular document with a slash (/) at middle.
-    * Example: For a collection named "coll" and document created into it with **element/provider**="napi" and **element/id**="2" the generated element/key property will be "napi_2". Since you can have documents in other collections with **element/key** property equals to "napi_2", you need an way to identify the "napi_2" document of "coll1" collection. GloboMAP API will understand "coll/napi_2" as this document.
+    * Example: For a collection named "coll" and document created into it with **element/provider**="napi" and **element/id**="2" the generated element/key property will be "napi_2". Since you can have documents in other collections with **element/key** property equals to "napi_2", you need an way to identify the "napi_2" document of "coll" collection. GloboMAP API will understand "coll/napi_2" as this document.
 
 
 
