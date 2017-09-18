@@ -132,12 +132,12 @@ class DriverWorker(Thread):
                     )
                 except GloboMapException:
                     self.log.error('Error on globo Map API %s' % update)
-                    self.exception_handler.handle_exception(update)
+                    self.exception_handler.handle_exception(self.name, update)
                 except Exception:
                     self.log.exception(
                         'Unknown error updating element %s' % update
                     )
-                    self.exception_handler.handle_exception(update)
+                    self.exception_handler.handle_exception(self.name, update)
 
 
 class UpdateExceptionHandler(object):
@@ -153,19 +153,19 @@ class UpdateExceptionHandler(object):
             GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_VIRTUAL_HOST
         )
 
-    def handle_exception(self, update, retry=True):
+    def handle_exception(self, driver_name, update, retry=True):
         try:
             self.log.debug('Sending failing update to rabbitmq error queue')
 
             self.rabbit_mq.post_message(
                 GLOBOMAP_RMQ_ERROR_EXCHANGE,
-                'globomap.update.error.%s' % update.get('collection', '*'),
+                'globomap.error.%s.%s' % (driver_name, update.get('provider')),
                 json.dumps(update)
             )
         except ConnectionClosed:
             if retry:
                 self.log.error("RabbitMQ Connection closed, reconnecting")
                 self._connect_rabbit()
-                self.handle_exception(update, False)
+                self.handle_exception(driver_name, update, False)
         except Exception as err:
             self.log.exception('Unable to handle exception %s', err)

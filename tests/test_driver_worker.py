@@ -48,7 +48,7 @@ class TestDriverWorker(unittest.TestCase):
         globomap_client_mock.update_element_state.assert_called_once_with(
             'CREATE', 'collections', 'vip', updates[0]['element'], None
         )
-        exception_handler.handle_exception.assert_called_once_with(updates[0])
+        exception_handler.handle_exception.assert_called_once_with('Mock', updates[0])
 
     def _mock_driver(self, return_value):
         driver_mock = Mock()

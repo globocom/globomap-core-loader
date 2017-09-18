@@ -24,14 +24,14 @@ class TestExceptionHandler(unittest.TestCase):
     def test_handle_exception_ok(self):
         rabbit_mq_mock = self._mock_rabbit_mq_client([True])
         handler = UpdateExceptionHandler()
-        handler.handle_exception({"data": "test"})
+        handler.handle_exception('DriverName', {"data": "test"})
 
         self.assertEqual(1, rabbit_mq_mock.call_count)
 
     def test_handle_exception_on_connection_error(self):
         rabbit_mq_mock = self._mock_rabbit_mq_client([ConnectionClosed(), True])
         handler = UpdateExceptionHandler()
-        handler.handle_exception({"data": "test"})
+        handler.handle_exception('DriverName', {"data": "test"})
 
         self.assertEqual(2, rabbit_mq_mock.call_count)
 
