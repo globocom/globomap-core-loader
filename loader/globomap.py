@@ -76,7 +76,7 @@ class GloboMapClient(object):
         if elements:
             return elements[0]
 
-    def _make_request(self, method, uri, data=None):
+    def _make_request(self, method, uri, data=None, retry_count=0):
         request_url = '%s%s' % (self.host, uri)
 
         self._log_http('REQUEST', method, request_url, data)
@@ -89,7 +89,9 @@ class GloboMapClient(object):
 
         if status == 404:
             raise ElementNotFoundException()
-        if status >= 400:
+        elif status == 503 and retry_count < 2:
+            self._make_request(method, uri, data, retry_count + 1)
+        elif status >= 400:
             raise GloboMapException()
         return self._parse_response(content, status)
 
