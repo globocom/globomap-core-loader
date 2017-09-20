@@ -33,7 +33,7 @@ class TestDriverWorker(unittest.TestCase):
 
     def test_sync_updates_expected_exception(self):
         update = open_json('tests/json/driver/driver_output_create.json')
-        globomap_client_mock = self._mock_globomap_client(GloboMapException())
+        globomap_client_mock = self._mock_globomap_client(GloboMapException(None, None))
         exception_handler = MagicMock()
 
         DriverWorker(globomap_client_mock, Mock(), exception_handler)._process_update(update)

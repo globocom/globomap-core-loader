@@ -127,8 +127,10 @@ class DriverWorker(Thread):
                 update.get('element'),
                 update.get('key'),
             )
-        except GloboMapException:
-            self.log.error('Error on globo Map API %s' % update)
+        except GloboMapException, e:
+            self.log.error('Could not process update: %s' % update)
+            self.log.error('Status code: %s' % e.status_code)
+            self.log.error('Response body: %s' % e.response)
             self.exception_handler.handle_exception(self.name, update)
 
 

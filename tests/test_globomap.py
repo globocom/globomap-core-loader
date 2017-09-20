@@ -212,11 +212,13 @@ class TestGloboMapCllient(unittest.TestCase):
     def test_retry_http_request_on_status_503_failed_after_three_retries(self):
         requests_mock = self._mock_request([503, 503, 503])
 
-        with self.assertRaises(GloboMapException):
+        try:
             payload = open_json('tests/json/globomap/vip.json')
             self.globomap_client.update_element_state(
                 'CREATE', 'collections', 'vip', payload, None
             )
+        except GloboMapException, e:
+            self.assertEqual(503, e.status_code)
             self.assertEqual(3, requests_mock.request.call_count)
 
     def _assert_request_called(self, requests_mock, method, url, payload):

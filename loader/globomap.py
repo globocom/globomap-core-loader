@@ -15,7 +15,6 @@
 """
 import json
 import logging
-
 import requests
 
 
@@ -92,7 +91,8 @@ class GloboMapClient(object):
         elif status == 503 and retry_count < 2:
             self._make_request(method, uri, data, retry_count + 1)
         elif status >= 400:
-            raise GloboMapException()
+            raise GloboMapException(status, content)
+
         return self._parse_response(content, status)
 
     def _log_http(self, operation, method, url, content=None, status=''):
@@ -117,8 +117,13 @@ class GloboMapClient(object):
 
 
 class GloboMapException(Exception):
-    pass
+
+    def __init__(self, status_code, response):
+        self.status_code = status_code
+        self.response = response
 
 
 class ElementNotFoundException(GloboMapException):
-    pass
+
+    def __init__(self):
+        super(ElementNotFoundException, self).__init__(None, None)
