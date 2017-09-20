@@ -14,10 +14,14 @@
    limitations under the License.
 """
 import logging
+from pika.exceptions import ConnectionClosed
 from loader.rabbitmq import RabbitMQClient
-from loader.settings import GLOBOMAP_RMQ_USER, GLOBOMAP_RMQ_PASSWORD,\
-    GLOBOMAP_RMQ_HOST, GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_VIRTUAL_HOST,\
-    GLOBOMAP_RMQ_QUEUE_NAME
+from loader.settings import GLOBOMAP_RMQ_USER
+from loader.settings import GLOBOMAP_RMQ_PASSWORD
+from loader.settings import GLOBOMAP_RMQ_HOST
+from loader.settings import GLOBOMAP_RMQ_PORT
+from loader.settings import GLOBOMAP_RMQ_VIRTUAL_HOST
+from loader.settings import GLOBOMAP_RMQ_QUEUE_NAME
 
 
 class GenericDriver(object):
@@ -25,16 +29,34 @@ class GenericDriver(object):
     log = logging.getLogger(__name__)
 
     def __init__(self):
-        self.rabbit_mq = RabbitMQClient(
+        self._connect_rabbitmq()
+
+    def _connect_rabbitmq(self):
+        self.rabbitmq = RabbitMQClient(
             GLOBOMAP_RMQ_HOST, GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_USER,
             GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_VIRTUAL_HOST
         )
 
-    def updates(self, number_messages=1):
-        self.log.debug("Reading %s updates" % number_messages)
-        try:
-            return self.rabbit_mq.read_messages(
-                GLOBOMAP_RMQ_QUEUE_NAME, number_messages
-            ).next()
-        except StopIteration:
-            return []
+    def process_updates(self, callback):
+        """
+        Reads and processes messages from the GloboMap event bus until
+        there's no message left in the target queue. Only acks message if
+        processed successfully by the callback.
+        """
+        while True:
+            delivery_tag = None
+            try:
+                message, delivery_tag = self.rabbitmq.get_message(
+                    GLOBOMAP_RMQ_QUEUE_NAME
+                )
+                if message:
+                    callback(message)
+                    self.rabbitmq.ack_message(delivery_tag)
+                else:
+                    return
+            except ConnectionClosed:
+                self.log.error("Error connecting to RabbitMQ, reconnecting")
+                self._connect_rabbitmq()
+            except:
+                self.rabbitmq.nack_message(delivery_tag)
+                raise

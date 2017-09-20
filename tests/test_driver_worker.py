@@ -23,32 +23,25 @@ import unittest
 class TestDriverWorker(unittest.TestCase):
 
     def test_sync_updates(self):
-        updates = open_json('tests/json/driver/driver_output_create.json')
-        driver_mock = self._mock_driver(updates)
+        update = open_json('tests/json/driver/driver_output_create.json')
         globomap_client_mock = MagicMock()
 
-        worker = DriverWorker(globomap_client_mock, driver_mock, None)
-        worker._sync_updates()
-
-        self.assertEqual(2, driver_mock.updates.call_count)
+        DriverWorker(globomap_client_mock, Mock(), None)._process_update(update)
         globomap_client_mock.update_element_state.assert_called_once_with(
-            'CREATE', 'collections', 'vip', updates[0]['element'], None
+            'CREATE', 'collections', 'vip', update['element'], None
         )
 
     def test_sync_updates_expected_exception(self):
-        updates = open_json('tests/json/driver/driver_output_create.json')
-        driver_mock = self._mock_driver(updates)
+        update = open_json('tests/json/driver/driver_output_create.json')
         globomap_client_mock = self._mock_globomap_client(GloboMapException())
         exception_handler = MagicMock()
 
-        worker = DriverWorker(globomap_client_mock, driver_mock, exception_handler)
-        worker._sync_updates()
+        DriverWorker(globomap_client_mock, Mock(), exception_handler)._process_update(update)
 
-        self.assertEqual(2, driver_mock.updates.call_count)
         globomap_client_mock.update_element_state.assert_called_once_with(
-            'CREATE', 'collections', 'vip', updates[0]['element'], None
+            'CREATE', 'collections', 'vip', update['element'], None
         )
-        exception_handler.handle_exception.assert_called_once_with('Mock', updates[0])
+        exception_handler.handle_exception.assert_called_once_with('Mock', update)
 
     def _mock_driver(self, return_value):
         driver_mock = Mock()

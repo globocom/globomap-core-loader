@@ -89,9 +89,9 @@ class GloboMapClient(object):
 
         if status == 404:
             raise ElementNotFoundException()
-        elif status >= 400:
+        if status >= 400:
             raise GloboMapException()
-        return self._parse_response(content)
+        return self._parse_response(content, status)
 
     def _log_http(self, operation, method, url, content=None, status=''):
         if self.log.isEnabledFor(logging.DEBUG):
@@ -103,8 +103,8 @@ class GloboMapClient(object):
                 '%s: %s %s %s' % (operation, method, url, status)
             )
 
-    def _parse_response(self, response):
-        if response:
+    def _parse_response(self, response, status):
+        if response and status in (200, 201):
             return json.loads(response)
 
     def _build_uri(self, type, collection, key=None):

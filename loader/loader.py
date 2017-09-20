@@ -23,7 +23,6 @@ from pika.exceptions import ConnectionClosed
 from globomap import GloboMapClient
 from globomap import GloboMapException
 from settings import DRIVER_FETCH_INTERVAL
-from settings import DRIVER_NUMBER_OF_UPDATES
 from settings import DRIVERS
 from settings import GLOBOMAP_API_ADDRESS
 from settings import GLOBOMAP_RMQ_ERROR_EXCHANGE
@@ -32,7 +31,6 @@ from settings import GLOBOMAP_RMQ_PASSWORD
 from settings import GLOBOMAP_RMQ_PORT
 from settings import GLOBOMAP_RMQ_USER
 from settings import GLOBOMAP_RMQ_VIRTUAL_HOST
-
 from rabbitmq import RabbitMQClient
 
 
@@ -77,12 +75,12 @@ class CoreLoader(object):
 
     def _create_driver_instance(self, driver_class, package, params):
         driver_type = getattr(importlib.import_module(package), driver_class)
-        has_update_method = hasattr(driver_type, 'updates') and \
-            callable(getattr(driver_type, 'updates'))
+        has_update_method = hasattr(driver_type, 'process_updates') and \
+            callable(getattr(driver_type, 'process_updates'))
 
         if not has_update_method:
             raise AttributeError(
-                "Driver '%s' does not implement 'updates'" % driver_class
+                "Driver '%s' doesnt implement 'process_updates'" % driver_class
             )
 
         if params:
@@ -92,6 +90,11 @@ class CoreLoader(object):
 
 
 class DriverWorker(Thread):
+    """
+    Worker bound to a driver instance that processes all the messages
+    provided by the driver and then sleeps for the amount of seconds
+    configured by the DRIVER_FETCH_INTERVAL envinroment variable.
+    """
 
     log = logging.getLogger(__name__)
 
@@ -105,7 +108,7 @@ class DriverWorker(Thread):
     def run(self):
         while True:
             try:
-                self._sync_updates()
+                self.driver.process_updates(self._process_update)
             except Exception:
                 self.log.exception(
                     'Error syncing updates from driver %s' % self.driver
@@ -115,29 +118,18 @@ class DriverWorker(Thread):
                 self.log.debug('Sleeping for %ss' % DRIVER_FETCH_INTERVAL)
                 time.sleep(DRIVER_FETCH_INTERVAL)
 
-    def _sync_updates(self):
-        while True:
-            updates = self.driver.updates(DRIVER_NUMBER_OF_UPDATES)
-            if not updates:
-                break
-
-            for update in updates:
-                try:
-                    self.globomap_client.update_element_state(
-                        update['action'],
-                        update['type'],
-                        update['collection'],
-                        update.get('element'),
-                        update.get('key'),
-                    )
-                except GloboMapException:
-                    self.log.error('Error on globo Map API %s' % update)
-                    self.exception_handler.handle_exception(self.name, update)
-                except Exception:
-                    self.log.exception(
-                        'Unknown error updating element %s' % update
-                    )
-                    self.exception_handler.handle_exception(self.name, update)
+    def _process_update(self, update):
+        try:
+            self.globomap_client.update_element_state(
+                update['action'],
+                update['type'],
+                update['collection'],
+                update.get('element'),
+                update.get('key'),
+            )
+        except GloboMapException:
+            self.log.error('Error on globo Map API %s' % update)
+            self.exception_handler.handle_exception(self.name, update)
 
 
 class UpdateExceptionHandler(object):

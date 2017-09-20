@@ -27,7 +27,7 @@ class ApiTestCase(unittest.TestCase):
 
     def test_send_updates(self):
         rabbit_mock = self._mock_rabbitmq_client(True)
-        updates = open_json('tests/json/driver/driver_output_create.json')
+        updates = [open_json('tests/json/driver/driver_output_create.json')]
         response = self.app.post(
             '/v1/updates',
             data=json.dumps(updates),
