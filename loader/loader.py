@@ -150,10 +150,11 @@ class UpdateExceptionHandler(object):
     def handle_exception(self, driver_name, update, retry=True):
         try:
             self.log.debug('Sending failing update to rabbitmq error queue')
-
+            collection = update.get('collection')
+            key = 'globomap.error.%s.%s' % (driver_name, collection)
             self.rabbit_mq.post_message(
                 GLOBOMAP_RMQ_ERROR_EXCHANGE,
-                'globomap.error.%s.%s' % (driver_name, update.get('provider')),
+                key,
                 json.dumps(update)
             )
         except ConnectionClosed:
