@@ -131,6 +131,8 @@ class DriverWorker(Thread):
             self.log.error('Could not process update: %s' % update)
             self.log.error('Status code: %s' % e.status_code)
             self.log.error('Response body: %s' % e.response)
+            update['status'] = e.status_code
+            update['error_msg'] = e.response
             self.exception_handler.handle_exception(self.name, update)
 
 

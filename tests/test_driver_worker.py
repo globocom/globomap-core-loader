@@ -33,7 +33,9 @@ class TestDriverWorker(unittest.TestCase):
 
     def test_sync_updates_expected_exception(self):
         update = open_json('tests/json/driver/driver_output_create.json')
-        globomap_client_mock = self._mock_globomap_client(GloboMapException(None, None))
+        globomap_client_mock = self._mock_globomap_client(
+            GloboMapException(400, {"errors": "error msg"})
+        )
         exception_handler = MagicMock()
 
         DriverWorker(globomap_client_mock, Mock(), exception_handler)._process_update(update)
@@ -42,6 +44,8 @@ class TestDriverWorker(unittest.TestCase):
             'CREATE', 'collections', 'vip', update['element'], None
         )
         exception_handler.handle_exception.assert_called_once_with('Mock', update)
+        self.assertEqual(400, update['status'])
+        self.assertEqual({"errors": "error msg"}, update['error_msg'])
 
     def _mock_driver(self, return_value):
         driver_mock = Mock()
