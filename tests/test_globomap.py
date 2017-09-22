@@ -209,6 +209,26 @@ class TestGloboMapCllient(unittest.TestCase):
 
         self.assertEqual(2, requests_mock.request.call_count)
 
+    def test_retry_http_request_on_status_409(self):
+        requests_mock = self._mock_request([409])
+
+        payload = open_json('tests/json/globomap/vip.json')
+        self.globomap_client.update_element_state(
+            'CREATE', 'collections', 'vip', payload, None
+        )
+
+        self.assertEqual(1, requests_mock.request.call_count)
+
+    def test_retry_http_request_on_status_400(self):
+        requests_mock = self._mock_request([400])
+
+        with self.assertRaises(GloboMapException):
+            payload = open_json('tests/json/globomap/vip.json')
+            self.globomap_client.update_element_state(
+                'CREATE', 'collections', 'vip', payload, None
+            )
+            self.assertEqual(1, requests_mock.request.call_count)
+
     def test_retry_http_request_on_status_503_failed_after_three_retries(self):
         requests_mock = self._mock_request([503, 503, 503])
 

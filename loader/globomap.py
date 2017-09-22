@@ -90,7 +90,7 @@ class GloboMapClient(object):
             raise ElementNotFoundException()
         elif status == 503 and retry_count < 2:
             self._make_request(method, uri, data, retry_count + 1)
-        elif status >= 400:
+        elif status >= 400 and status != 409:
             raise GloboMapException(status, content)
 
         return self._parse_response(content, status)
