@@ -50,3 +50,7 @@ DRIVERS = [
         }
     }
 ]
+
+SPECS = {
+    'updates': 'api/specs/updates.json',
+}

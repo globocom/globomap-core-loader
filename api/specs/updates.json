@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "items": {
+    "additionalProperties": false,
+    "properties": {
+      "action": {
+        "enum": [
+          "DELETE",
+          "PATCH",
+          "UPDATE",
+          "CREATE"
+        ],
+        "type": "string"
+      },
+      "collection": {
+        "minimum": 1,
+        "type": "string"
+      },
+      "element": {
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "object"
+          },
+          "properties_metadata": {
+            "type": "object"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "integer"
+          },
+          "to": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "timestamp",
+          "from",
+          "id",
+          "to",
+          "provider"
+        ],
+        "type": "object"
+      },
+      "key": {
+        "minimum": 1,
+        "type": "string"
+      },
+      "type": {
+        "enum": [
+          "edges",
+          "collections"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "action",
+      "type",
+      "collection"
+    ],
+    "type": "object"
+  },
+  "type": "array"
+}
