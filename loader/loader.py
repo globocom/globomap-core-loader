@@ -38,9 +38,9 @@ class CoreLoader(object):
 
     log = logging.getLogger(__name__)
 
-    def __init__(self):
+    def __init__(self, driver_name=None):
         self.log.info('Starting Globmap loader')
-        self.drivers = self._load_drivers()
+        self.drivers = self._load_drivers(driver_name)
         self.globomap_client = GloboMapClient(GLOBOMAP_API_ADDRESS)
 
     def load(self):
@@ -49,13 +49,21 @@ class CoreLoader(object):
                 self.globomap_client, driver, UpdateExceptionHandler()
             ).start()
 
-    def _load_drivers(self):
+    def full_load(self):
+        for driver in self.drivers:
+            DriverFullLoadWorker(driver).start()
+
+    def _load_drivers(self, driver_name=None):
         self.log.info('Loading drivers: %s' % DRIVERS)
 
         drivers = []
         for driver_config in DRIVERS:
             package = driver_config['package']
             driver_class = driver_config['class']
+
+            if driver_name and driver_name != driver_class:
+                continue
+
             try:
                 driver_instance = self._create_driver_instance(
                     driver_class, package, driver_config.get('params')
@@ -134,6 +142,35 @@ class DriverWorker(Thread):
             update['status'] = e.status_code
             update['error_msg'] = e.response
             self.exception_handler.handle_exception(self.name, update)
+
+
+class DriverFullLoadWorker(Thread):
+    """
+    Worker bound to a driver instance that runs the 'full_load'
+    method on the driver. This method must take care of all processing
+    needed to recreate all the objects (collections and edges) in the domain
+    that this driver is responsible for.
+    """
+
+    log = logging.getLogger(__name__)
+
+    def __init__(self, driver):
+        Thread.__init__(self)
+        self.name = driver.__class__.__name__
+        self.driver = driver
+
+    def run(self):
+        try:
+            full_load_action = getattr(self.driver, "full_load", None)
+            if callable(full_load_action):
+                self.driver.full_load()
+            else:
+                self.log.error("Driver does not implement 'full_load' method")
+        except Exception:
+            self.log.exception(
+                'Error syncing updates from driver %s' % self.driver
+            )
+        return
 
 
 class UpdateExceptionHandler(object):
