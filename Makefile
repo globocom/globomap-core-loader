@@ -32,5 +32,8 @@ setup: requirements.txt
 run:
 	@python run.py
 
+run_load:
+	@python run_load.py
+
 run_api:
 	@python run_api.py
