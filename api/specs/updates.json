@@ -25,6 +25,9 @@
           "id": {
             "type": "string"
           },
+          "name": {
+            "type": "string"
+          },
           "properties": {
             "type": "object"
           },
