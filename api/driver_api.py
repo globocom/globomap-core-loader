@@ -48,8 +48,11 @@ def insert_updates():
         spec = SPECS.get('updates')
         util.json_validate(spec).validate(updates)
 
+        driver_name = request.headers.get('X-DRIVER-NAME', '*')
+
         if updates:
             for update in updates:
+                update.update({'driver_name': driver_name})
                 event_published = rabbit_mq.post_message(
                     GLOBOMAP_RMQ_EXCHANGE,
                     GLOBOMAP_RMQ_KEY,

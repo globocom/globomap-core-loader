@@ -13,17 +13,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-#!/usr/bin/env python
+# !/usr/bin/env python
 import logging
+import os
 
 from loader.loader import CoreLoader
 
 if __name__ == '__main__':
 
+    filename = os.getenv('GLOBOMAP_LOG_FILENAME', 'globomap-loader.log')
     logging.basicConfig(
-        filename='globomap-loader.log',
+        filename=filename,
         level=logging.INFO,
         format='%(asctime)s %(threadName)s %(levelname)s %(message)s'
     )
-    logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.getLogger('requests').setLevel(logging.WARNING)
     CoreLoader().load()
