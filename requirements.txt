@@ -1,6 +1,6 @@
 Flask==0.12.2
 globomap-driver-acs==0.0.18
-globomap-driver-napi==0.0.9
+globomap-driver-napi==0.0.10
 json-spec==0.10.1
 pika==0.10.0
 requests==2.10.0
