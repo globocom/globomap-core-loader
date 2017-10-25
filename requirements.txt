@@ -4,3 +4,4 @@ globomap-driver-napi==0.0.9
 json-spec==0.10.1
 pika==0.10.0
 requests==2.10.0
+gunicorn==19.7.1
