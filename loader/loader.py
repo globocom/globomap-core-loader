@@ -18,10 +18,10 @@ import json
 import logging
 import time
 from threading import Thread
-from pika.exceptions import ConnectionClosed
 
 from globomap import GloboMapClient
 from globomap import GloboMapException
+from pika.exceptions import ConnectionClosed
 from settings import DRIVER_FETCH_INTERVAL
 from settings import DRIVERS
 from settings import GLOBOMAP_API_ADDRESS
@@ -31,6 +31,7 @@ from settings import GLOBOMAP_RMQ_PASSWORD
 from settings import GLOBOMAP_RMQ_PORT
 from settings import GLOBOMAP_RMQ_USER
 from settings import GLOBOMAP_RMQ_VIRTUAL_HOST
+
 from rabbitmq import RabbitMQClient
 
 
@@ -141,7 +142,9 @@ class DriverWorker(Thread):
             self.log.error('Response body: %s' % e.response)
             update['status'] = e.status_code
             update['error_msg'] = e.response
-            self.exception_handler.handle_exception(self.name, update)
+            name = update['driver_name'] \
+                if update.get('driver_name') else self.name
+            self.exception_handler.handle_exception(name, update)
 
 
 class DriverFullLoadWorker(Thread):
@@ -161,7 +164,7 @@ class DriverFullLoadWorker(Thread):
 
     def run(self):
         try:
-            full_load_action = getattr(self.driver, "full_load", None)
+            full_load_action = getattr(self.driver, 'full_load', None)
             if callable(full_load_action):
                 self.driver.full_load()
             else:
@@ -198,7 +201,7 @@ class UpdateExceptionHandler(object):
             )
         except ConnectionClosed:
             if retry:
-                self.log.error("RabbitMQ Connection closed, reconnecting")
+                self.log.error('RabbitMQ Connection closed, reconnecting')
                 self._connect_rabbit()
                 self.handle_exception(driver_name, update, False)
         except Exception as err:
