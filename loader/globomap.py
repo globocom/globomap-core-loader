@@ -15,6 +15,7 @@
 """
 import json
 import logging
+
 import requests
 
 
@@ -37,13 +38,15 @@ class GloboMapClient(object):
 
     def create(self, type, collection, payload):
         return self._make_request(
-            'POST', self._build_uri(type, collection), payload
+            'POST', self._build_uri(type, collection), {
+                'Content-Type': 'application/json'}, payload
         )
 
     def update(self, type, collection, key, payload):
         try:
             return self._make_request(
-                'PUT', self._build_uri(type, collection, key), payload
+                'PUT', self._build_uri(type, collection, key), {
+                    'Content-Type': 'application/json'}, payload
             )
         except ElementNotFoundException:
             return self.create(type, collection, payload)
@@ -51,7 +54,8 @@ class GloboMapClient(object):
     def patch(self, type, collection, key, payload):
         try:
             return self._make_request(
-                'PATCH', self._build_uri(type, collection, key), payload
+                'PATCH', self._build_uri(type, collection, key), {
+                    'Content-Type': 'application/json'}, payload
             )
         except ElementNotFoundException:
             return self.create(type, collection, payload)
@@ -75,12 +79,17 @@ class GloboMapClient(object):
         if elements:
             return elements[0]
 
-    def _make_request(self, method, uri, data=None, retry_count=0):
+    def _make_request(self, method, uri, headers=None, data=None, retry_count=0):
         request_url = '%s%s' % (self.host, uri)
 
-        self._log_http('REQUEST', method, request_url, data)
+        self._log_http('REQUEST', method, request_url, headers, data)
 
-        response = requests.request(method, request_url, data=json.dumps(data))
+        response = requests.request(
+            method,
+            request_url,
+            headers=headers,
+            data=json.dumps(data)
+        )
         status = response.status_code
         content = response.content
 
@@ -89,7 +98,7 @@ class GloboMapClient(object):
         if status == 404:
             raise ElementNotFoundException()
         elif status == 503 and retry_count < 2:
-            self._make_request(method, uri, data, retry_count + 1)
+            self._make_request(method, uri, headers, data, retry_count + 1)
         elif status >= 400 and status != 409:
             raise GloboMapException(status, content)
 
@@ -110,8 +119,8 @@ class GloboMapClient(object):
             return json.loads(response)
 
     def _build_uri(self, type, collection, key=None):
-        uri = '/%s/%s' % (type, collection)
-        uri += '/%s' % (key) if key else ''
+        uri = '/%s/%s/' % (type, collection)
+        uri += '%s/' % (key) if key else ''
 
         return uri
 
