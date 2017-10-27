@@ -6,11 +6,11 @@
 {
  "action": "<action>",
  "collection": "<edge_name>",
+ "key": "<key>",
  "element": {
    "from": "<id_document>",
-   "id": "<key>",
+   "id": "<id_internal>",
    "name": "<name>",
-   "key": "<key>",
    "properties": {
      "key_name_1": "value_1",
      "key_name_2": "value_2"
@@ -37,10 +37,10 @@
 {
  "action": "<action>",
  "collection": "<collection_name>",
+ "key": "<key>",
  "element": {
-   "id": "<key>",
+   "id": "<id_internal>",
    "name": "<name>",
-   "key": "<key>",
    "properties": {
      "key_name_1": "value_1",
      "key_name_2": "value_2"
@@ -76,7 +76,7 @@
 | **element/timestamp**           | It's the unix timestamp that says moment that data have to be updated. If you don't have this at your data structure, generate one at runtime.                                                                                                                                                                                |
 | **element/properties**          | It's an optional field. It's a dict where keys are the additional properties, with corresponding values.                                                                                                                                                                                                                      |
 | **element/properties_metadata** | It's a dict, where keys are the additional properties, where the corresponding values are dictionaries where description is mandatory.                                                                                                                                                                                        |
-| **element/key**                 | Mandatory at UPDATE, PATCH and DELETE actions. At CREATE it is auto set by GloboMAP API.                                                                                                                                                                                                                                      |
+| **key**                         | Mandatory at UPDATE, PATCH and DELETE actions. At CREATE it is auto set by GloboMAP API.                                                                                                                                                                                                                                      |
 
 ### Specific for edges:
 
