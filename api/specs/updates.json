@@ -8,7 +8,8 @@
           "DELETE",
           "PATCH",
           "UPDATE",
-          "CREATE"
+          "CREATE",
+          "CLEAR"
         ],
         "type": "string"
       },
@@ -18,6 +19,17 @@
       },
       "element": {
         "additionalProperties": false,
+        "items": {
+          "properties": {
+            "field": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string"
+            },
+            "value": {}
+          }
+        },
         "properties": {
           "from": {
             "type": "string"
@@ -63,7 +75,10 @@
       "type",
       "collection"
     ],
-    "type": "object"
+    "type": [
+      "array",
+      "object"
+    ]
   },
   "type": "array"
 }
