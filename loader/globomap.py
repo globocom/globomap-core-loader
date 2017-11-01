@@ -79,6 +79,13 @@ class GloboMapClient(object):
         if elements:
             return elements[0]
 
+    def clear(self, type, collection, payload):
+        path = '{}/clear'.format(collection)
+        return self._make_request(
+            'POST', self._build_uri(type, path), {
+                'Content-Type': 'application/json'}, payload
+        )
+
     def _make_request(self, method, uri, headers=None, data=None, retry_count=0):
         request_url = '%s%s' % (self.host, uri)
 
