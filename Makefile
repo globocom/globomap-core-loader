@@ -37,3 +37,6 @@ run_load:
 
 run_api:
 	@python run_api.py
+
+deploy:
+	@tsuru app-deploy -a $(project) Procfile requirements.txt api driver loader rabbitmq

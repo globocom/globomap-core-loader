@@ -56,7 +56,10 @@
             "type": "string"
           }
         },
-        "type": "object"
+        "type": [
+          "object",
+          "array"
+        ]
       },
       "key": {
         "minimum": 1,
