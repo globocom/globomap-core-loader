@@ -16,15 +16,19 @@
 import json
 import logging
 
-import requests
+from requests import Session
+from requests.adapters import HTTPAdapter
 
 
 class GloboMapClient(object):
 
     log = logging.getLogger(__name__)
 
-    def __init__(self, host):
+    def __init__(self, host, retries=5):
         self.host = host
+        self.session = Session()
+        self.session.mount('https://', HTTPAdapter(max_retries=retries))
+        self.session.mount('http://', HTTPAdapter(max_retries=retries))
 
     def update_element_state(self, action, type, collection, element, key):
         if action.upper() == 'CREATE':
@@ -91,7 +95,7 @@ class GloboMapClient(object):
 
         self._log_http('REQUEST', method, request_url, headers, data)
 
-        response = requests.request(
+        response = self.session.request(
             method,
             request_url,
             headers=headers,

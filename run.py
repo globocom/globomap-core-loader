@@ -16,6 +16,7 @@
 # !/usr/bin/env python
 import logging
 import os
+import sys
 
 from loader.loader import CoreLoader
 
@@ -28,4 +29,5 @@ if __name__ == '__main__':
         format='%(asctime)s %(threadName)s %(levelname)s %(message)s'
     )
     logging.getLogger('requests').setLevel(logging.WARNING)
-    CoreLoader().load()
+    driver_class_name = sys.argv[1] if len(sys.argv) > 1 else None
+    CoreLoader(driver_class_name).load()
