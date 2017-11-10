@@ -56,7 +56,7 @@
    "provider": "<driver_name>",
    "timestamp": "<timestamp>"
  },
- "type": "collection"
+ "type": "collections"
 }
 ```
 
