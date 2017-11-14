@@ -16,8 +16,6 @@
 import json
 import logging
 
-from flask import abort
-from flask import jsonify
 from flask import request
 from jsonspec.validators.exceptions import ValidationError
 from werkzeug.exceptions import BadRequest
@@ -25,14 +23,8 @@ from werkzeug.exceptions import BadRequest
 from api import api
 from api import decorators
 from api import util
-from loader.rabbitmq import RabbitMQClient
-from loader.settings import GLOBOMAP_RMQ_EXCHANGE
-from loader.settings import GLOBOMAP_RMQ_HOST
-from loader.settings import GLOBOMAP_RMQ_KEY
-from loader.settings import GLOBOMAP_RMQ_PASSWORD
-from loader.settings import GLOBOMAP_RMQ_PORT
-from loader.settings import GLOBOMAP_RMQ_USER
-from loader.settings import GLOBOMAP_RMQ_VIRTUAL_HOST
+from api.facade import LoaderAPIFacade
+from api.job.models import Job
 from loader.settings import SPECS
 
 
@@ -43,48 +35,59 @@ log = logging.getLogger(__name__)
 @decorators.json_response
 def insert_updates():
     try:
-        rabbit_mq = get_rabbit_mq_client()
         updates = request.get_json()
+        if not updates or len(updates) == 0:
+            raise BadRequest("Invalid empty request")
+
         spec = SPECS.get('updates')
         util.json_validate(spec).validate(updates)
-
         driver_name = request.headers.get('X-DRIVER-NAME', '*')
 
-        if updates:
-            for update in updates:
-                update.update({'driver_name': driver_name})
-                event_published = rabbit_mq.post_message(
-                    GLOBOMAP_RMQ_EXCHANGE,
-                    GLOBOMAP_RMQ_KEY,
-                    json.dumps(update)
-                )
-
-                if not event_published:
-                    log.error('Error publishing update %s' % update)
-                    res = {'message': 'Error publishing update'}
-                    return res, 400
-
-        res = {'message': '%s updates published successfully' %
-               len(updates or [])}
-        return res, 200
-
+        job_id = LoaderAPIFacade().publish_updates(updates, driver_name)
+        res = {
+            'message': 'Updates published successfully',
+            'jobid': job_id
+        }
+        return res, 202, {'Location': '{}/job/{}'.format(request.path, job_id)}
     except ValidationError as error:
-
-        res = util.validate(error)
         log.exception('Error sending updates to rabbitmq')
-        return res, 400
-
+        return util.validate(error), 400
+    except BadRequest as e:
+        return str(e.description), 400
     except Exception as e:
-
-        if type(e) is BadRequest:
-            return str(e), 400
         log.exception('Error sending updates to rabbitmq')
-        res = {'message': 'Error sending updates to rabbitmq'}
+        res = {'message': 'Error sending updates to queue'}
         return res, 500
 
 
-def get_rabbit_mq_client():
-    return RabbitMQClient(
-        GLOBOMAP_RMQ_HOST, GLOBOMAP_RMQ_PORT, GLOBOMAP_RMQ_USER,
-        GLOBOMAP_RMQ_PASSWORD, GLOBOMAP_RMQ_VIRTUAL_HOST
-    )
+@api.route('/updates/job/<job_id>', methods=['GET'])
+@decorators.json_response
+def get_job(job_id):
+    job = Job.find_by_uuid(job_id)
+    if not job:
+        return {'message': 'Job not found'}, 404
+
+    errors = []
+    for error in job.errors:
+        error_response = error.response
+        try:
+            error_response = json.loads(error.response)
+        except:
+            pass
+
+        errors.append({
+            'request': json.loads(error.request_body),
+            'response': error_response,
+            'status_code': error.status_code
+        })
+
+    response = {
+        'uuid': job_id,
+        'completed': job.completed,
+        'total_update_count': job.updates_count,
+        'successful_update_count': job.success_count,
+        'error_update_count': job.error_count,
+        'date': job.date_time,
+        'errors': errors
+    }
+    return response, 200

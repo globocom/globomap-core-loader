@@ -90,7 +90,8 @@ class GloboMapClient(object):
                 'Content-Type': 'application/json'}, payload
         )
 
-    def _make_request(self, method, uri, headers=None, data=None, retry_count=0):
+    def _make_request(self, method, uri,
+                      headers=None, data=None, retry_count=0):
         request_url = '%s%s' % (self.host, uri)
 
         self._log_http('REQUEST', method, request_url, headers, data)
@@ -107,7 +108,7 @@ class GloboMapClient(object):
         self._log_http('RESPONSE', method, request_url, content, status)
 
         if status == 404:
-            raise ElementNotFoundException()
+            raise ElementNotFoundException(404, content)
         elif status == 503 and retry_count < 2:
             self._make_request(method, uri, headers, data, retry_count + 1)
         elif status >= 400 and status != 409:
@@ -144,6 +145,4 @@ class GloboMapException(Exception):
 
 
 class ElementNotFoundException(GloboMapException):
-
-    def __init__(self):
-        super(ElementNotFoundException, self).__init__(None, None)
+    pass

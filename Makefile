@@ -23,11 +23,16 @@ compile: clean
 	@python -tt -m compileall .
 	@pep8 --format=pylint --statistics loader driver api
 
+tests: export ENV=test
+
 tests: clean compile
 	@python -m unittest discover -s tests/
 
 setup: requirements.txt
 	$(PIP) install -r $^
+
+run_migrations:
+	db-migrate --config=migrations/migrations.conf
 
 run:
 	@python run.py
