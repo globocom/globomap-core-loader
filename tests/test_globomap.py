@@ -16,13 +16,14 @@
 import json
 import unittest
 from loader.globomap import GloboMapClient, GloboMapException
-from mock import patch, MagicMock
+from mock import patch, MagicMock, Mock
 from tests.util import open_json
 
 
 class TestGloboMapCllient(unittest.TestCase):
 
     def setUp(self):
+        patch('loader.globomap.Session').start()
         self.globomap_client = GloboMapClient('http://localhost:8080')
 
     @classmethod
@@ -39,7 +40,8 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'POST',
-            'http://localhost:8080/collections/vip',
+            'http://localhost:8080/collections/vip/',
+            {'Content-Type': 'application/json'},
             payload
         )
 
@@ -55,6 +57,7 @@ class TestGloboMapCllient(unittest.TestCase):
                 requests_mock,
                 'POST',
                 'http://localhost:8080/collections/vip',
+                {'Content-Type': 'application/json'},
                 payload
             )
 
@@ -68,7 +71,8 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'PUT',
-            'http://localhost:8080/collections/vip/globomap_vip.test.com',
+            'http://localhost:8080/collections/vip/globomap_vip.test.com/',
+            {'Content-Type': 'application/json'},
             payload
         )
 
@@ -82,13 +86,15 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'PUT',
-            'http://localhost:8080/collections/vip/globomap_vip.test.com',
+            'http://localhost:8080/collections/vip/globomap_vip.test.com/',
+            {'Content-Type': 'application/json'},
             payload
         )
         self._assert_request_called(
             requests_mock,
             'POST',
-            'http://localhost:8080/collections/vip',
+            'http://localhost:8080/collections/vip/',
+            {'Content-Type': 'application/json'},
             payload
         )
 
@@ -104,6 +110,7 @@ class TestGloboMapCllient(unittest.TestCase):
                 requests_mock,
                 'UPDATE',
                 'http://localhost:8080/collections/vip/globomap_vip.test.com',
+                {'Content-Type': 'application/json'},
                 payload
             )
 
@@ -117,7 +124,8 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'PATCH',
-            'http://localhost:8080/collections/vip/globomap_vip.test.com',
+            'http://localhost:8080/collections/vip/globomap_vip.test.com/',
+            {'Content-Type': 'application/json'},
             payload
         )
 
@@ -131,13 +139,15 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'PATCH',
-            'http://localhost:8080/collections/vip/globomap_vip.test.com',
+            'http://localhost:8080/collections/vip/globomap_vip.test.com/',
+            {'Content-Type': 'application/json'},
             payload
         )
         self._assert_request_called(
             requests_mock,
             'POST',
-            'http://localhost:8080/collections/vip',
+            'http://localhost:8080/collections/vip/',
+            {'Content-Type': 'application/json'},
             payload
         )
 
@@ -153,6 +163,7 @@ class TestGloboMapCllient(unittest.TestCase):
                 requests_mock,
                 'PATCH',
                 'http://localhost:8080/collections/vip/globomap_vip.test.com',
+                {'Content-Type': 'application/json'},
                 payload
             )
 
@@ -166,8 +177,7 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'DELETE',
-            'http://localhost:8080/collections/vip/globomap_vip.test.com',
-            None
+            'http://localhost:8080/collections/vip/globomap_vip.test.com/'
         )
 
     def test_delete_element_not_found(self):
@@ -180,8 +190,7 @@ class TestGloboMapCllient(unittest.TestCase):
         self._assert_request_called(
             requests_mock,
             'DELETE',
-            'http://localhost:8080/collections/vip/globomap_vip.test.com',
-            None
+            'http://localhost:8080/collections/vip/globomap_vip.test.com/'
         )
 
     def test_delete_element_expect_exception(self):
@@ -195,8 +204,7 @@ class TestGloboMapCllient(unittest.TestCase):
             self._assert_request_called(
                 requests_mock,
                 'DELETE',
-                'http://localhost:8080/collections/vip/globomap_vip.test.com',
-                None
+                'http://localhost:8080/collections/vip/globomap_vip.test.com/'
             )
 
     def test_retry_http_request_on_status_503(self):
@@ -207,7 +215,7 @@ class TestGloboMapCllient(unittest.TestCase):
             'CREATE', 'collections', 'vip', payload, None
         )
 
-        self.assertEqual(2, requests_mock.request.call_count)
+        self.assertEqual(2, requests_mock.call_count)
 
     def test_retry_http_request_on_status_409(self):
         requests_mock = self._mock_request([409])
@@ -217,7 +225,7 @@ class TestGloboMapCllient(unittest.TestCase):
             'CREATE', 'collections', 'vip', payload, None
         )
 
-        self.assertEqual(1, requests_mock.request.call_count)
+        self.assertEqual(1, requests_mock.call_count)
 
     def test_retry_http_request_on_status_400(self):
         requests_mock = self._mock_request([400])
@@ -227,7 +235,7 @@ class TestGloboMapCllient(unittest.TestCase):
             self.globomap_client.update_element_state(
                 'CREATE', 'collections', 'vip', payload, None
             )
-            self.assertEqual(1, requests_mock.request.call_count)
+            self.assertEqual(1, requests_mock.call_count)
 
     def test_retry_http_request_on_status_503_failed_after_three_retries(self):
         requests_mock = self._mock_request([503, 503, 503])
@@ -239,13 +247,17 @@ class TestGloboMapCllient(unittest.TestCase):
             )
         except GloboMapException, e:
             self.assertEqual(503, e.status_code)
-            self.assertEqual(3, requests_mock.request.call_count)
+            self.assertEqual(3, requests_mock.call_count)
 
-    def _assert_request_called(self, requests_mock, method, url, payload):
-        requests_mock.request.assert_any_call(method, url, data=json.dumps(payload))
+    def _assert_request_called(self, requests_mock, method, url, headers=None, payload=None):
+        requests_mock.assert_any_call(
+            method, url, headers=headers, data=json.dumps(payload))
 
     def _mock_request(self, status_codes):
-        requests_mock = patch('loader.globomap.requests').start()
+        self.globomap_client.session = Mock()
+        self.globomap_client.session.request = Mock()
+
         responses = [MagicMock(status_code=s, content=None) for s in status_codes]
-        requests_mock.request.side_effect = responses
-        return requests_mock
+
+        self.globomap_client.session.request.side_effect = responses
+        return self.globomap_client.session.request

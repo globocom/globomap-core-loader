@@ -19,6 +19,8 @@ import logging
 import time
 from threading import Thread
 
+from api.database import db_session
+from api.job.models import Job, JobError
 from globomap import GloboMapClient
 from globomap import GloboMapException
 from pika.exceptions import ConnectionClosed
@@ -136,15 +138,47 @@ class DriverWorker(Thread):
                 update.get('element'),
                 update.get('key'),
             )
+            self.update_job_success(update.get('jobid'))
         except GloboMapException, e:
             self.log.error('Could not process update: %s' % update)
             self.log.error('Status code: %s' % e.status_code)
             self.log.error('Response body: %s' % e.response)
-            update['status'] = e.status_code
-            update['error_msg'] = e.response
-            name = update['driver_name'] \
-                if update.get('driver_name') else self.name
-            self.exception_handler.handle_exception(name, update)
+
+            try:
+                self.update_job_error(update.get('jobid'), update, e)
+
+                update['status'] = e.status_code
+                update['error_msg'] = e.response
+                name = update.get('driver_name', self.name)
+
+                self.exception_handler.handle_exception(name, update)
+            except:
+                db_session.rollback()
+                raise
+            finally:
+                db_session.remove()
+
+    def update_job_success(self, job_id):
+        if job_id:
+            job = Job.find_by_uuid(job_id)
+            if job:
+                job.increment_success_count()
+                job.save()
+            else:
+                self.log.error("Job with id %s not found" % job_id)
+
+    def update_job_error(self, job_id, update, err):
+
+        if job_id:
+            job = Job.find_by_uuid(job_id)
+            if job:
+                err = JobError(
+                    json.dumps(update), err.response, err.status_code
+                )
+                job.add_error(err)
+                job.save()
+            else:
+                self.log.error("Job with id %s not found" % job_id)
 
 
 class DriverFullLoadWorker(Thread):

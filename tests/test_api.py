@@ -17,6 +17,8 @@ import json
 import unittest
 from mock import Mock, patch
 from api.app import create_app
+from api.database import init_db, destroy_db
+from api.job.models import Job
 from tests.util import open_json
 
 
@@ -24,6 +26,14 @@ class ApiTestCase(unittest.TestCase):
 
     def setUp(self):
         self.app = create_app().test_client()
+
+    @classmethod
+    def setUpClass(cls):
+        init_db()
+
+    @classmethod
+    def tearDownClass(self):
+        destroy_db()
 
     def test_send_updates(self):
         rabbit_mock = self._mock_rabbitmq_client(True)
@@ -34,9 +44,14 @@ class ApiTestCase(unittest.TestCase):
             headers={'Content-Type': 'application/json'}
         )
 
-        self.assertEqual(200, response.status_code)
-        self.assertEqual("1 updates published successfully", json.loads(response.data)["message"])
+        response_json = json.loads(response.data)
+        self.assertEqual(202, response.status_code)
+        self.assertEqual('Location', response.headers[1][0])
+        self.assertEqual('http://localhost/v1/updates/job/%s' % response_json['jobid'], response.headers[1][1])
+        self.assertEqual("Updates published successfully", response_json["message"])
         self.assertEqual(1, rabbit_mock.post_message.call_count)
+        self.assertEqual(1, rabbit_mock.confirm_publish.call_count)
+        self.assertIsNotNone(Job.find_by_uuid(response_json['jobid']))
 
     def test_send_updates_no_updates_found(self):
         rabbit_mock = self._mock_rabbitmq_client(True)
@@ -46,34 +61,34 @@ class ApiTestCase(unittest.TestCase):
             headers={'Content-Type': 'application/json'}
         )
 
-        self.assertEqual(200, response.status_code)
-        self.assertEqual("0 updates published successfully", json.loads(response.data)["message"])
+        self.assertEqual(400, response.status_code)
+        self.assertEqual("Invalid empty request", json.loads(response.data)["errors"])
         self.assertEqual(0, rabbit_mock.post_message.call_count)
 
     def test_send_updates_expected_status_400(self):
-        rabbit_mock = self._mock_rabbitmq_client(False)
         response = self.app.post(
             '/v1/updates',
-            data=json.dumps(open_json('tests/json/driver/driver_output_create.json')),
+            data=json.dumps({"key" : "wrong input"}),
             headers={'Content-Type': 'application/json'}
         )
 
         self.assertEqual(400, response.status_code)
-        self.assertEqual(1, rabbit_mock.post_message.call_count)
 
     def test_send_updates_expected_status_500(self):
         rabbit_mock = self._mock_rabbitmq_client(Exception())
+        updates = [open_json('tests/json/driver/driver_output_create.json')]
         response = self.app.post(
             '/v1/updates',
-            data=json.dumps(open_json('tests/json/driver/driver_output_create.json')),
+            data=json.dumps(updates),
             headers={'Content-Type': 'application/json'}
         )
 
         self.assertEqual(500, response.status_code)
         self.assertEqual(1, rabbit_mock.post_message.call_count)
+        self.assertEqual(1, rabbit_mock.discard_publish.call_count)
 
     def _mock_rabbitmq_client(self, data=None):
-        rabbit_mq_mock = patch("api.driver_api.get_rabbit_mq_client").start()
+        rabbit_mq_mock = patch("api.facade.LoaderAPIFacade._get_rabbit_mq_client").start()
         post_message_mock = Mock()
         rabbit_mq_mock.return_value = post_message_mock
         if type(data) is bool:

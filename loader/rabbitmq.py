@@ -27,7 +27,6 @@ class RabbitMQClient(object):
         )
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
-        self.channel.confirm_delivery()
 
     def get_message(self, queue):
         method_frame, _, body = self.channel.basic_get(queue)
@@ -35,7 +34,7 @@ class RabbitMQClient(object):
             body = json.loads(body)
             return body, method_frame.delivery_tag
         else:
-            return (None, None)
+            return None, None
 
     def ack_message(self, delivery_tag):
         self.channel.basic_ack(delivery_tag)
@@ -43,10 +42,20 @@ class RabbitMQClient(object):
     def nack_message(self, delivery_tag):
         self.channel.basic_nack(delivery_tag)
 
-    def post_message(self, exchange_name, key, message):
-        return self.channel.basic_publish(
+    def post_message(self, exchange_name, key, message, confirm=True):
+        self.channel.tx_select()
+        published = self.channel.basic_publish(
             exchange=exchange_name,
             routing_key=key,
             body=message,
             mandatory=True
         )
+        if published and confirm:
+            self.confirm_publish()
+        return confirm
+
+    def confirm_publish(self):
+        self.channel.tx_commit()
+
+    def discard_publish(self):
+        self.channel.tx_rollback()

@@ -20,4 +20,10 @@ from api import api
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(api, url_prefix='/v1')
+
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        from api.database import db_session
+        db_session.remove()
+
     return app

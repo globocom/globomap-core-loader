@@ -1,0 +1,29 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+CREATE TABLE `job` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(50) NOT NULL,
+  `updates_count` int(11) NOT NULL,
+  `success_count` int(11) NOT NULL,
+  `completed` tinyint(1) NOT NULL,
+  `date_created` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `job_error` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(50) NOT NULL,
+  `request_body` varchar(1024) NOT NULL,
+  `response` varchar(1024) NOT NULL,
+  `status_code` varchar(3) DEFAULT NULL,
+  `job_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `job_id` (`job_id`),
+  CONSTRAINT `job_error_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `job` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+"""
+
+SQL_DOWN = u"""
+DROP TABLE `job_error`;
+DROP TABLE `job`;
+"""
