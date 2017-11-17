@@ -22,12 +22,10 @@ from loader.loader import CoreLoader
 
 if __name__ == '__main__':
 
-    filename = os.getenv('GLOBOMAP_LOG_FILENAME', 'globomap-loader.log')
     logging.basicConfig(
-        filename=filename,
         level=logging.WARNING,
-        format='%(asctime)s %(threadName)s %(levelname)s %(message)s'
+        format='%(asctime)s %(threadName)s %(levelname)s %(message)s',
+        stream=sys.stdout
     )
-    logging.getLogger('requests').setLevel(logging.WARNING)
     driver_class_name = sys.argv[1] if len(sys.argv) > 1 else None
     CoreLoader(driver_class_name).load()

@@ -45,5 +45,5 @@ deploy_api:
 
 deploy_loader:
 	@cp Procfile_loader Procfile
-	@tsuru app-deploy -a $(project) Procfile requirements.txt api driver loader run.py
+	@tsuru app-deploy -a $(project) Procfile requirements.txt api driver loader run.py run_load.py
 	@rm Procfile
