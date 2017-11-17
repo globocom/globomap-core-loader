@@ -45,7 +45,7 @@ run_api:
 
 deploy_api:
 	@cp Procfile_api Procfile
-	@tsuru app-deploy -a $(project) Procfile requirements.txt api driver loader rabbitmq
+	@tsuru app-deploy -a $(project) Procfile requirements.txt api driver loader
 	@rm Procfile
 
 deploy_loader:
