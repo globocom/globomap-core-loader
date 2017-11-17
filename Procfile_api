@@ -1,1 +1,1 @@
-web: gunicorn -b 0.0.0.0:$PORT api.wsgi -w 8 --keep-alive 5 --log-level WARNING
+web: gunicorn -b 0.0.0.0:$PORT api.wsgi -w 8 --keep-alive 5 --log-level DEBUG

@@ -27,5 +27,5 @@ if __name__ == '__main__':
         format='%(asctime)s %(threadName)s %(levelname)s %(message)s',
         stream=sys.stdout
     )
-    driver_class_name = sys.argv[1] if len(sys.argv) > 1 else None
-    CoreLoader(driver_class_name).load()
+    for _ in range(0, 20):
+        CoreLoader().load()
