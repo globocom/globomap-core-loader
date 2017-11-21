@@ -18,7 +18,7 @@ import sys
 
 from api.app import create_app
 logging.basicConfig(
-    level=logging.WARNING,
+    level=logging.INFO,
     format='%(asctime)s %(threadName)s %(levelname)s %(message)s',
     stream=sys.stdout
 )
