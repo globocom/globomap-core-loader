@@ -23,9 +23,8 @@ from loader.loader import CoreLoader
 if __name__ == '__main__':
 
     logging.basicConfig(
-        level=logging.WARNING,
+        level=logging.INFO,
         format='%(asctime)s %(threadName)s %(levelname)s %(message)s',
         stream=sys.stdout
     )
-    for _ in range(0, 20):
-        CoreLoader().load()
+    CoreLoader().load()
