@@ -13,5 +13,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
+import logging
+import sys
+
 from api.app import create_app
+logging.basicConfig(
+    level=logging.WARNING,
+    format='%(asctime)s %(threadName)s %(levelname)s %(message)s',
+    stream=sys.stdout
+)
+
 application = create_app()

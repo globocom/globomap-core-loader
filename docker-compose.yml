@@ -1,0 +1,36 @@
+version: '3'
+services:
+
+    api-loader:
+        container_name: globomap_loader_api
+        build: .
+        ports:
+            - "5003:5003"
+            - "5004:5004"
+        env_file:
+            - globomap-loader.env
+        volumes:
+            - .:/app
+        networks:
+            - globomapapi_globomap_net
+        command: make run_api
+        external_links:
+            - globomap_queue
+
+    loader:
+        container_name: globomap_loader
+        build: .
+        env_file:
+            - globomap-loader.env
+        volumes:
+            - .:/app
+        networks:
+            - globomapapi_globomap_net
+        command: make run_loader
+        external_links:
+            - globomap_queue
+            - globomap_api
+
+networks:
+    globomapapi_globomap_net:
+        external: true

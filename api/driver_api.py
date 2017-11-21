@@ -37,7 +37,7 @@ def insert_updates():
     try:
         updates = request.get_json()
         if not updates or len(updates) == 0:
-            raise BadRequest("Invalid empty request")
+            raise BadRequest('Invalid empty request')
 
         spec = SPECS.get('updates')
         util.json_validate(spec).validate(updates)
@@ -91,3 +91,25 @@ def get_job(job_id):
         'errors': errors
     }
     return response, 200
+
+
+@api.route('/healthcheck', methods=['GET'])
+def healthcheck():
+    return 'WORKING', 200
+
+
+@api.route('/healthcheck/deps', methods=['GET'])
+@decorators.json_response
+def healthcheck_deps():
+
+    deps = {
+        'rabbitmq': None
+    }
+    try:
+        LoaderAPIFacade()
+    except Exception as err:
+        deps['rabbitmq'] = False
+    else:
+        deps['rabbitmq'] = True
+
+    return deps, 200
