@@ -81,6 +81,8 @@ class CoreLoader(object):
                 self.log.exception(
                     'Unknown error loading driver %s' % driver_config
                 )
+            finally:
+                db_session.remove()
 
         return drivers
 
@@ -127,6 +129,7 @@ class DriverWorker(Thread):
             finally:
                 self.log.debug('No more updates found')
                 self.log.debug('Sleeping for %ss' % DRIVER_FETCH_INTERVAL)
+                db_session.remove()
                 time.sleep(DRIVER_FETCH_INTERVAL)
 
     def _process_update(self, update):
