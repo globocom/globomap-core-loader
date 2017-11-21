@@ -25,7 +25,8 @@ if os.getenv('ENV') == 'test':
 else:
     default_uri = 'mysql://root:@localhost/globomaploader'
     database_uri = os.getenv('SQLALCHEMY_DATABASE_URI', default_uri)
-    engine = create_engine(database_uri, convert_unicode=True)
+    engine = create_engine(database_uri, convert_unicode=True,
+                           pool_size=20, max_overflow=10)
 
 session_maker = sessionmaker(
     autocommit=False, autoflush=False, bind=engine

@@ -1,6 +1,6 @@
 Flask==0.12.2
 Flask-SQLAlchemy==2.3.1
-globomap-driver-acs==0.0.21
+globomap-driver-acs==0.0.22
 globomap-driver-napi==0.0.18
 gunicorn==19.7.1
 json-spec==0.10.1
