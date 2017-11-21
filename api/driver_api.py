@@ -16,6 +16,7 @@
 import json
 import logging
 
+from flask import jsonify
 from flask import request
 from jsonspec.validators.exceptions import ValidationError
 from werkzeug.exceptions import BadRequest
@@ -95,21 +96,32 @@ def get_job(job_id):
 
 @api.route('/healthcheck', methods=['GET'])
 def healthcheck():
+    deps = list_deps()
+    problems = {}
+    for key in deps:
+        if deps[key].get('status') is False:
+            problems.update({key: deps[key]})
+    if problems:
+        return jsonify(problems), 503
     return 'WORKING', 200
 
 
 @api.route('/healthcheck/deps', methods=['GET'])
 @decorators.json_response
 def healthcheck_deps():
+    deps = list_deps()
+    return deps, 200
 
+
+def list_deps():
     deps = {
-        'rabbitmq': None
+        'rabbitmq': {}
     }
     try:
         LoaderAPIFacade()
-    except Exception as err:
-        deps['rabbitmq'] = False
+    except:
+        deps['rabbitmq']['status'] = False
     else:
-        deps['rabbitmq'] = True
+        deps['rabbitmq']['status'] = True
 
-    return deps, 200
+    return deps
