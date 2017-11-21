@@ -39,6 +39,8 @@ class GloboMapClient(object):
             return self.patch(type, collection, key, element)
         elif action.upper() == 'DELETE':
             return self.delete(type, collection, key)
+        elif action.upper() == 'CLEAR':
+            return self.clear(type, collection, element)
 
     def create(self, type, collection, payload):
         return self._make_request(

@@ -15,8 +15,13 @@
 """
 import json
 import unittest
-from loader.globomap import GloboMapClient, GloboMapException
-from mock import patch, MagicMock, Mock
+
+from mock import MagicMock
+from mock import Mock
+from mock import patch
+
+from loader.globomap import GloboMapClient
+from loader.globomap import GloboMapException
 from tests.util import open_json
 
 
@@ -103,7 +108,7 @@ class TestGloboMapCllient(unittest.TestCase):
             requests_mock = self._mock_request([500])
             payload = open_json('tests/json/globomap/vip.json')
             self.globomap_client.update_element_state(
-                'UPDATE', 'collections', 'vip',  payload, 'globomap_vip.test.com'
+                'UPDATE', 'collections', 'vip', payload, 'globomap_vip.test.com'
             )
 
             self._assert_request_called(
@@ -178,6 +183,24 @@ class TestGloboMapCllient(unittest.TestCase):
             requests_mock,
             'DELETE',
             'http://localhost:8080/collections/vip/globomap_vip.test.com/'
+        )
+
+    def test_clear_element(self):
+        requests_mock = self._mock_request([200])
+        payload = [[{
+            'operator': '<',
+            'field': 'timestamp',
+            'value': 1511296003
+        }]]
+        self.globomap_client.update_element_state(
+            'CLEAR', 'collections', 'vip', payload, None
+        )
+        self._assert_request_called(
+            requests_mock,
+            'POST',
+            'http://localhost:8080/collections/vip/clear/',
+            {'Content-Type': 'application/json'},
+            payload
         )
 
     def test_delete_element_not_found(self):
@@ -257,7 +280,8 @@ class TestGloboMapCllient(unittest.TestCase):
         self.globomap_client.session = Mock()
         self.globomap_client.session.request = Mock()
 
-        responses = [MagicMock(status_code=s, content=None) for s in status_codes]
+        responses = [MagicMock(status_code=s, content=None)
+                     for s in status_codes]
 
         self.globomap_client.session.request.side_effect = responses
         return self.globomap_client.session.request
