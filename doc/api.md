@@ -69,6 +69,7 @@
 | - CREATE                        | Create document inside collection/edge.                                                                                                                                                                                                                                                                                       |
 | - UPDATE                        | Updates sent properties and remove other existing properties. If some property in payload does not exist, it will be created.                                                                                                                                                                                                 |
 | - DELETE                        | Delete document inside collection/edge.                                                                                                                                                                                                                                                                                       |
+| - CLEAR                         | Delete documents inside collection/edge using filter of search                                                                                                                                                                                                                                                                                       |
 | **collection**                  | Specify the name of edge/collection that you want to insert documents.                                                                                                                                                                                                                                                        |
 | **element/id**                  | Its an unique hash for the same provider of collecttion. Some drivers uses an internal control identifier, others uses a MD5 hash and others uses any string. It doesn't have right or wrong models, it will vary in about how each document links with anothers and how documents know each other.                           |
 | **element/name**                | String for a human identification of document.                                                                                                                                                                                                                                                                                |
@@ -84,6 +85,12 @@
 |-------------------------------|-------------------------------------------------------------------|
 | **element/from**              | Identifier of the source document at collection/key database.     |
 | **element/to**                | Identifier of the destination document at collection/key database.|  
+
+
+### Specific for CLEAR action:
+| Field         | Description
+|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **element**   | A list with list of dict. Each dict represents a filter. Dicts inside same list are filter with AND. Lists inside of macro list are filter with OR. |  
 
 ### Observation:
 
