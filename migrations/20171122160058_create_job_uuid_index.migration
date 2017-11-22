@@ -1,0 +1,8 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+CREATE INDEX uuid_idx ON job (uuid);
+"""
+
+SQL_DOWN = u"""
+DROP INDEX job.uuid_idx;
+"""
