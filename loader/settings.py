@@ -28,25 +28,25 @@ GLOBOMAP_RMQ_ERROR_EXCHANGE = os.getenv('GLOBOMAP_RMQ_ERROR_EXCHANGE')
 GLOBOMAP_RMQ_KEY = os.getenv('GLOBOMAP_RMQ_BINDING_KEY', 'globomap.updates')
 
 DRIVERS = [
-    {'package': 'driver.generic', 'class': 'GenericDriver'},
-    {'package': 'globomap_driver_napi.driver', 'class': 'Napi'},
+    {'package': 'driver.generic', 'class': 'GenericDriver', 'factor': 5},
+    {'package': 'globomap_driver_napi.driver', 'class': 'Napi', 'factor': 1},
     {
         'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
         'params': {
             'env': 'CTA'
-        }
+        }, 'factor': 1
     },
     {
         'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
         'params': {
             'env': 'DEV'
-        }
+        }, 'factor': 1
     },
     {
         'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
         'params': {
             'env': 'CME'
-        }
+        }, 'factor': 1
     }
 ]
 

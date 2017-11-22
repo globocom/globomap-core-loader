@@ -50,5 +50,10 @@ deploy_api:
 
 deploy_loader:
 	@cp Procfile_loader Procfile
-	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt api driver loader run.py run_load.py
+	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt api driver loader run.py
+	@rm Procfile
+
+deploy_reset_loader:
+	@cp Procfile_reset_loader Procfile
+	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt api driver loader run_load.py
 	@rm Procfile

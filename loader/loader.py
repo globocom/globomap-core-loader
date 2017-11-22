@@ -19,8 +19,6 @@ import logging
 import time
 from threading import Thread
 
-from api.database import db_session
-from api.job.models import Job, JobError
 from globomap import GloboMapClient
 from globomap import GloboMapException
 from pika.exceptions import ConnectionClosed
@@ -34,6 +32,9 @@ from settings import GLOBOMAP_RMQ_PORT
 from settings import GLOBOMAP_RMQ_USER
 from settings import GLOBOMAP_RMQ_VIRTUAL_HOST
 
+from api.database import db_session
+from api.job.models import Job
+from api.job.models import JobError
 from rabbitmq import RabbitMQClient
 
 
@@ -67,22 +68,25 @@ class CoreLoader(object):
             if driver_name and driver_name != driver_class:
                 continue
 
-            try:
-                driver_instance = self._create_driver_instance(
-                    driver_class, package, driver_config.get('params')
-                )
-                drivers.append(driver_instance)
-                self.log.info("Driver '%s' loaded" % driver_class)
-            except AttributeError:
-                self.log.exception('Cannot load driver %s' % driver_class)
-            except ImportError:
-                self.log.exception('Cannot load driver %s' % driver_class)
-            except Exception:
-                self.log.exception(
-                    'Unknown error loading driver %s' % driver_config
-                )
-            finally:
-                db_session.remove()
+            factor = driver_config.get('factor') or 1
+            for _ in range(0, factor):
+
+                try:
+                    driver_instance = self._create_driver_instance(
+                        driver_class, package, driver_config.get('params')
+                    )
+                    drivers.append(driver_instance)
+                    self.log.info("Driver '%s' loaded" % driver_class)
+                except AttributeError:
+                    self.log.exception('Cannot load driver %s' % driver_class)
+                except ImportError:
+                    self.log.exception('Cannot load driver %s' % driver_class)
+                except Exception:
+                    self.log.exception(
+                        'Unknown error loading driver %s' % driver_config
+                    )
+                finally:
+                    db_session.remove()
 
         return drivers
 
@@ -168,7 +172,7 @@ class DriverWorker(Thread):
                 job.increment_success_count()
                 job.save()
             else:
-                self.log.error("Job with id %s not found" % job_id)
+                self.log.error('Job with id %s not found' % job_id)
 
     def update_job_error(self, job_id, update, err):
 
@@ -181,7 +185,7 @@ class DriverWorker(Thread):
                 job.add_error(err)
                 job.save()
             else:
-                self.log.error("Job with id %s not found" % job_id)
+                self.log.error('Job with id %s not found' % job_id)
 
 
 class DriverFullLoadWorker(Thread):
