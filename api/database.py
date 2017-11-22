@@ -33,7 +33,7 @@ session_maker = sessionmaker(
 )
 
 Base = declarative_base()
-db_session = scoped_session(session_maker)
+Session = scoped_session(session_maker)
 
 
 def init_db():

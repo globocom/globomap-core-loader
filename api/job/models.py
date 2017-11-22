@@ -13,17 +13,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
+import logging
 import uuid
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
-from api.database import db_session, Base
+from api.database import Base, Session
 
 
 class Job(Base):
 
     __tablename__ = 'job'
+    log = logging.getLogger(__name__)
 
     id = Column(Integer, primary_key=True)
     uuid = Column(String(50), nullable=False)
@@ -56,15 +58,22 @@ class Job(Base):
         self.errors.append(job_error)
 
     def save(self):
-        db_session.add(self)
+        session = Session()
+        session.add(self)
         if self._is_completed():
             self.completed = True
-        db_session.commit()
+            self.log.debug("JOB %s completed" % self.uuid)
+        session.commit()
         return self
 
     @staticmethod
-    def find_by_uuid(uuid):
-        return db_session.query(Job).filter_by(uuid=uuid).first()
+    def find_by_uuid(uuid, for_update=False):
+        session = Session()
+        if not for_update:
+            query = session.query(Job)
+        else:
+            query = session.query(Job).with_for_update()
+        return query.filter_by(uuid=uuid).first()
 
     @property
     def date_time(self):

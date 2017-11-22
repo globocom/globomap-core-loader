@@ -32,7 +32,7 @@ from settings import GLOBOMAP_RMQ_PORT
 from settings import GLOBOMAP_RMQ_USER
 from settings import GLOBOMAP_RMQ_VIRTUAL_HOST
 
-from api.database import db_session
+from api.database import Session
 from api.job.models import Job
 from api.job.models import JobError
 from rabbitmq import RabbitMQClient
@@ -86,7 +86,7 @@ class CoreLoader(object):
                         'Unknown error loading driver %s' % driver_config
                     )
                 finally:
-                    db_session.remove()
+                    Session.remove()
 
         return drivers
 
@@ -117,6 +117,7 @@ class DriverWorker(Thread):
 
     def __init__(self, globomap_client, driver, exception_handler):
         Thread.__init__(self)
+        self.session = Session()
         self.name = driver.__class__.__name__
         self.globomap_client = globomap_client
         self.driver = driver
@@ -133,11 +134,14 @@ class DriverWorker(Thread):
             finally:
                 self.log.debug('No more updates found')
                 self.log.debug('Sleeping for %ss' % DRIVER_FETCH_INTERVAL)
-                db_session.remove()
+                Session.remove()
                 time.sleep(DRIVER_FETCH_INTERVAL)
 
     def _process_update(self, update):
         try:
+            if update.get('jobid'):
+                self.log.info("Processing update from JOB %s" %
+                              update.get('jobid'))
             self.globomap_client.update_element_state(
                 update['action'],
                 update['type'],
@@ -160,14 +164,15 @@ class DriverWorker(Thread):
 
                 self.exception_handler.handle_exception(name, update)
             except:
-                db_session.rollback()
+                self.log.exception("Fail to handle update error")
+                self.session.rollback()
                 raise
             finally:
-                db_session.remove()
+                Session.remove()
 
     def update_job_success(self, job_id):
         if job_id:
-            job = Job.find_by_uuid(job_id)
+            job = Job.find_by_uuid(job_id, for_update=True)
             if job:
                 job.increment_success_count()
                 job.save()
@@ -177,7 +182,7 @@ class DriverWorker(Thread):
     def update_job_error(self, job_id, update, err):
 
         if job_id:
-            job = Job.find_by_uuid(job_id)
+            job = Job.find_by_uuid(job_id, for_update=True)
             if job:
                 err = JobError(
                     json.dumps(update), err.response, err.status_code

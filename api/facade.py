@@ -58,6 +58,6 @@ class LoaderAPIFacade(object):
                 job.save()
                 return job.uuid
             except:
-                self.log.error("Error publishing to rabbitmq")
+                self.log.exception("Error publishing to rabbitmq")
                 self.rabbitmq.discard_publish()
                 raise Exception("Failed to sendo updates to queue")
