@@ -1,0 +1,8 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+ALTER TABLE job_error MODIFY response TEXT;
+"""
+
+SQL_DOWN = u"""
+ALTER TABLE job_error MODIFY response varchar(1024);
+"""

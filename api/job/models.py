@@ -16,7 +16,7 @@
 import logging
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 from api.database import Base, Session
@@ -86,8 +86,8 @@ class JobError(Base):
 
     id = Column(Integer, primary_key=True)
     uuid = Column(String(50), nullable=False)
-    request_body = Column(String(1024), nullable=False)
-    response = Column(String(1024), nullable=False)
+    request_body = Column(Text, nullable=False)
+    response = Column(Text, nullable=False)
     status_code = Column(String(3), nullable=True)
     job_id = Column(Integer, ForeignKey('job.id', ondelete='CASCADE'),
                     nullable=False)
