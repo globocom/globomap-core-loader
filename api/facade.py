@@ -43,7 +43,7 @@ class LoaderAPIFacade(object):
     def publish_updates(self, updates, driver_name):
         if updates:
             try:
-                job = Job(len(updates))
+                job = Job(driver_name, len(updates))
                 for update in updates:
                     update.update(
                         {'driver_name': driver_name, 'jobid': job.uuid}

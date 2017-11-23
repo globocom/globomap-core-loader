@@ -84,6 +84,7 @@ def get_job(job_id):
 
     response = {
         'uuid': job_id,
+        'driver': job.driver,
         'completed': job.completed,
         'total_update_count': job.updates_count,
         'successful_update_count': job.success_count,

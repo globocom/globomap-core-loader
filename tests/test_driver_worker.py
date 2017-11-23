@@ -59,7 +59,7 @@ class TestDriverWorker(unittest.TestCase):
         self.assertEqual({"errors": "error msg"}, update['error_msg'])
 
     def test_update_job_error(self):
-        job = Job(1).save()
+        job = Job('driver', 1).save()
         worker = DriverWorker(None, None, None)
         response_mock = Mock()
         response_mock.response = '{"message": "error"}'
@@ -71,7 +71,7 @@ class TestDriverWorker(unittest.TestCase):
         self.assertEquals(1, job.error_count)
 
     def test_update_job_success(self):
-        job = Job(1).save()
+        job = Job('driver', 1).save()
         worker = DriverWorker(None, None, None)
         worker.update_job_success(job.uuid)
 

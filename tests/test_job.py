@@ -36,32 +36,32 @@ class TestJob(unittest.TestCase):
         destroy_db()
 
     def test_increment_success_count(self):
-        job = Job(1)
+        job = Job('driver', 1)
         job.increment_success_count()
         self.assertEqual(1, job.success_count)
 
     def test_is_completed(self):
-        job = Job(1)
+        job = Job('driver', 1)
         job.increment_success_count()
         self.assertTrue(job._is_completed())
 
     def test_not_completed(self):
-        job = Job(1)
+        job = Job('driver', 1)
         self.assertFalse(job._is_completed())
 
     def test_add_error(self):
-        job = Job(1)
+        job = Job('driver', 1)
         job.add_error(JobError('', '', 200))
         self.assertEqual(1, job.error_count)
 
     def test_save(self):
-        job = Job(1)
+        job = Job('driver', 1)
         job.save()
         self.assertFalse(job.completed)
         self.assertIsNotNone(Job.find_by_uuid(job.uuid))
 
     def test_save_completed(self):
-        job = Job(1)
+        job = Job('driver', 1)
         job.increment_success_count()
         job.save()
         self.assertTrue(job.completed)

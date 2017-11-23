@@ -29,6 +29,7 @@ class Job(Base):
 
     id = Column(Integer, primary_key=True)
     uuid = Column(String(50), nullable=False)
+    driver = Column(String(50), nullable=True)
     updates_count = Column(Integer, nullable=False)
     success_count = Column(Integer, nullable=False)
     completed = Column(Boolean, nullable=False)
@@ -37,8 +38,9 @@ class Job(Base):
         'JobError', backref='Job', lazy=True, passive_deletes=True
     )
 
-    def __init__(self, updates_count):
+    def __init__(self, driver, updates_count):
         self.uuid = str(uuid.uuid4())
+        self.driver = driver
         self.date_created = datetime.now()
         self.updates_count = updates_count
         self.completed = False

@@ -18,7 +18,7 @@ import unittest
 from mock import Mock, patch
 from api.app import create_app
 from api.database import init_db, destroy_db
-from api.job.models import Job
+from api.job.models import Job, JobError
 from tests.util import open_json
 
 
@@ -86,6 +86,25 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(500, response.status_code)
         self.assertEqual(1, rabbit_mock.post_message.call_count)
         self.assertEqual(1, rabbit_mock.discard_publish.call_count)
+
+    def test_get_job(self):
+        job = Job('driver_name', 1)
+        job.add_error(JobError('{"a": "1"}', '{"a": "1"}', 400))
+        job.save()
+
+        response = self.app.get(
+            '/v1/updates/job/%s' % job.uuid,
+            headers={'Content-Type': 'application/json'}
+        )
+        job_json = json.loads(response.data)
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(job.uuid, job_json['uuid'])
+        self.assertEqual('driver_name', job_json['driver'])
+        self.assertEqual(0, job_json['successful_update_count'])
+        self.assertEqual(1, job_json['error_update_count'])
+        self.assertEqual(True, job_json['completed'])
+        self.assertEqual(1, len(job_json['errors']))
 
     def _mock_rabbitmq_client(self, data=None):
         rabbit_mq_mock = patch("api.facade.LoaderAPIFacade._get_rabbit_mq_client").start()
