@@ -14,7 +14,7 @@
    limitations under the License.
 """
 import logging
-from pika.exceptions import ConnectionClosed
+from pika.exceptions import ConnectionClosed, ChannelClosed
 from loader.rabbitmq import RabbitMQClient
 from loader.settings import GLOBOMAP_RMQ_USER
 from loader.settings import GLOBOMAP_RMQ_PASSWORD
@@ -54,7 +54,7 @@ class GenericDriver(object):
                     self.rabbitmq.ack_message(delivery_tag)
                 else:
                     return
-            except ConnectionClosed:
+            except (ConnectionClosed, ChannelClosed) as e:
                 self.log.error("Error connecting to RabbitMQ, reconnecting")
                 self._connect_rabbitmq()
             except:

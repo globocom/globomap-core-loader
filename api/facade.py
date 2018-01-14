@@ -54,8 +54,8 @@ class LoaderAPIFacade(object):
                         json.dumps(update), False
                     )
 
-                self.rabbitmq.confirm_publish()
                 job.save()
+                self.rabbitmq.confirm_publish()
                 return job.uuid
             except:
                 self.log.exception("Error publishing to rabbitmq")
