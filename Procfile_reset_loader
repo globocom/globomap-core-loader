@@ -1,1 +1,1 @@
-worker: python run_load.py
+worker: python scheduler.py

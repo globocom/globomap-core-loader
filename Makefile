@@ -55,5 +55,5 @@ deploy_loader:
 
 deploy_reset_loader:
 	@cp Procfile_reset_loader Procfile
-	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt api driver loader run_load.py
+	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt api driver loader run_load.py scheduler.py
 	@rm Procfile

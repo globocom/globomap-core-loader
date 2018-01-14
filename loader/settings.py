@@ -29,6 +29,7 @@ GLOBOMAP_RMQ_KEY = os.getenv('GLOBOMAP_RMQ_BINDING_KEY', 'globomap.updates')
 DATABASE_POOL_SIZE = os.getenv('DATABASE_POOL_SIZE', 20)
 DATABASE_POOL_OVERFLOW = os.getenv('DATABASE_POOL_OVERFLOW', 10)
 DATABASE_POOL_RECYCLE = os.getenv('DATABASE_POOL_RECYCLE', 120)
+SCHEDULER_FREQUENCY_EXEC = os.getenv('SCHEDULER_FREQUENCY_EXEC')
 
 DRIVERS = [
     {'package': 'driver.generic', 'class': 'GenericDriver', 'factor': 5},
