@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-   Copyright 2017 Globo.com
+   Copyright 2018 Globo.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,10 +14,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import os
+from globomap_core_loader.api.v1 import api
+from globomap_core_loader.api.v1 import blueprint
+from globomap_core_loader.api.v1.endpoints.driver_api import ns as driver_api_namespace
+from globomap_core_loader.api.v1.endpoints.healthcheck import ns as healthcheck_ns
 
-from globomap_core_loader.api.app import create_app
+api.add_namespace(driver_api_namespace)
+api.add_namespace(healthcheck_ns)
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run('0.0.0.0', int(os.getenv('PORT', '5000')), debug=True)
+__all__ = ['api', 'blueprint']

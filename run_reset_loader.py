@@ -13,10 +13,18 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import os
+# !/usr/bin/env python
+import logging
+import sys
 
-from globomap_core_loader.api.app import create_app
+from globomap_core_loader.loader import CoreLoader
 
 if __name__ == '__main__':
-    app = create_app()
-    app.run('0.0.0.0', int(os.getenv('PORT', '5000')), debug=True)
+
+    logging.basicConfig(
+        level=logging.WARNING,
+        format='time=%(asctime)s level=%(levelname)s msg=%(message)s',
+        stream=sys.stdout
+    )
+    driver_class_name = sys.argv[1] if len(sys.argv) > 1 else None
+    CoreLoader(driver_class_name).full_load()

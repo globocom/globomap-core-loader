@@ -13,10 +13,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import os
+import logging
 
 from globomap_core_loader.api.app import create_app
+from globomap_core_loader.settings import LOGGING
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run('0.0.0.0', int(os.getenv('PORT', '5000')), debug=True)
+logging.config.dictConfig(LOGGING)
+
+application = create_app()

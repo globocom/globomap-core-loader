@@ -8,6 +8,9 @@ RUN apt-get update
 RUN apt-get install -y python-dev libmysqlclient-dev
 RUN apt-get install -y build-essential python-pip
 RUN apt-get install -y git
+RUN apt-get install -y telnet
+
+RUN apt-get install -y netcat
 
 # update pip
 RUN python -m pip install pip --upgrade

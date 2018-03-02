@@ -1,6 +1,31 @@
 version: '3'
 services:
 
+    queue:
+        container_name: globomap_loader_queue
+        image: rabbitmq:3.6.9
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        command: sh -c "rabbitmq-plugins enable rabbitmq_management rabbitmq_shovel rabbitmq_shovel_management; rabbitmq-server"
+        volumes:
+            - ./scripts/docker/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro
+            - ./scripts/docker/definitions.json:/etc/rabbitmq/definitions.json:ro
+        networks:
+            - globomapapi_globomap_net
+
+    db:
+        container_name: globomap_loader_db_mysql
+        image: mysql:5.6
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        volumes:
+            - globomap_loader_db_vol:/var/lib/mysql
+        networks:
+            - globomapapi_globomap_net
+
     api-loader:
         container_name: globomap_loader_api
         build: .
@@ -8,14 +33,17 @@ services:
             - "5003:5003"
             - "5004:5004"
         env_file:
-            - globomap-loader.env
+            - globomap-loader-api.env
         volumes:
             - .:/app
         networks:
             - globomapapi_globomap_net
         command: make run_api
+        depends_on:
+            - db
+            - queue
         external_links:
-            - globomap_queue
+            - queue:globomap_loader_queue
 
     loader:
         container_name: globomap_loader
@@ -26,11 +54,17 @@ services:
             - .:/app
         networks:
             - globomapapi_globomap_net
-        command: make run_loader
+        command: sh scripts/docker/docker-start-loader.sh
+        depends_on:
+            - db
+            - queue
         external_links:
-            - globomap_queue
             - globomap_api
+            - queue:globomap_loader_queue
 
 networks:
     globomapapi_globomap_net:
         external: true
+
+volumes:
+    globomap_loader_db_vol:

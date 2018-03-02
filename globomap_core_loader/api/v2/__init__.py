@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-   Copyright 2017 Globo.com
+   Copyright 2018 Globo.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,10 +14,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import os
+from flask import Blueprint
+from flask_restplus import Api
 
-from globomap_core_loader.api.app import create_app
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run('0.0.0.0', int(os.getenv('PORT', '5000')), debug=True)
+blueprint = Blueprint('APIv2', __name__, url_prefix='/v2')
+api = Api(blueprint, version='2.0', title='GloboMap Loader API',
+          description='GloboMap Loader API')

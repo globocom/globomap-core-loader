@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-   Copyright 2017 Globo.com
+   Copyright 2018 Globo.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,10 +14,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import os
+from flask_restplus import reqparse
 
-from globomap_core_loader.api.app import create_app
+post_updates_parser = reqparse.RequestParser()
+post_updates_parser.add_argument(
+    'data',
+    type=str,
+    required=True,
+    help='Updates',
+    location='json'
+)
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run('0.0.0.0', int(os.getenv('PORT', '5000')), debug=True)
+
+auth_parser = reqparse.RequestParser()
+auth_parser.add_argument(
+    'data',
+    type=str,
+    required=True,
+    help='Auth',
+    location='json'
+)

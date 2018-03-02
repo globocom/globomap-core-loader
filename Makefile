@@ -16,7 +16,7 @@ help:
 clean:
 	@echo "Cleaning project ..."
 	@rm -rf build dist *.egg-info
-	@find . \( -name '*.pyc' -o -name '**/*.pyc' -o -name '*~' \) -delete
+	@find . \( -name '*.pyc' -o  -name '__pycache__' -o -name '**/*.pyc' -o -name '*~' \) -delete
 
 compile: clean
 	@echo "Compiling source code..."
@@ -34,26 +34,30 @@ setup: requirements.txt
 run_migrations:
 	db-migrate --config=migrations/migrations.conf
 
-run:
-	@python run.py
+run_loader: run_migrations
+	@python run_loader.py $(module)
 
-run_load:
-	@python run_load.py
+run_reset_loader:
+	@python run_reset_loader.py
 
-run_api:
+run_api: run_migrations
 	@python run_api.py
 
 deploy_api:
 	@cp Procfile_api Procfile
-	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt api driver loader
+	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_api.py
 	@rm Procfile
 
 deploy_loader:
 	@cp Procfile_loader Procfile
-	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt api driver loader run.py
+	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_loader.py
 	@rm Procfile
 
 deploy_reset_loader:
 	@cp Procfile_reset_loader Procfile
-	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt api driver loader run_load.py scheduler.py
+	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_reset_loader.py
 	@rm Procfile
+
+docker: ## Run a development web server
+	@docker-compose build
+	@docker-compose up -d
