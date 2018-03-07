@@ -4,7 +4,7 @@ flask-restplus==0.10.1
 Flask-SQLAlchemy==2.3.1
 globomap-driver-acs==0.0.23
 globomap-driver-napi==0.0.18
-globomap_auth_manager==0.0.5
+globomap_auth_manager==0.0.7
 gunicorn==19.7.1
 json-spec==0.10.1
 MySQL-python==1.2.5

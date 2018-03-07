@@ -14,23 +14,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import functools
-
-from flask import request
-
-from globomap_core_loader.api.v2.auth.facade import validate_token
 
 
-def permission_classes(permission_classes):
-    def outer(func):
-        @functools.wraps(func)
-        def inner(self, *args, **kwargs):
+class AuthException(Exception):
 
-            token = request.headers.get('Authorization')
-            auth_inst = validate_token(token)
-            if auth_inst:
-                for permission_class in permission_classes:
-                    permission_class(auth_inst)
-            return func(self, *args, **kwargs)
-        return inner
-    return outer
+    def __init__(self, message):
+        super(AuthException, self).__init__(message)
+
+        self.message = message

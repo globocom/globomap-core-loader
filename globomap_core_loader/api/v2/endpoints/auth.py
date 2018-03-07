@@ -21,6 +21,7 @@ from globomap_auth_manager import exceptions
 
 from globomap_core_loader.api.v2 import api
 from globomap_core_loader.api.v2.auth import facade
+from globomap_core_loader.api.v2.auth.exceptions import AuthException
 from globomap_core_loader.api.v2.parsers import auth_parser
 
 ns = api.namespace(
@@ -46,7 +47,7 @@ class CreateAuth(Resource):
                 app.logger.error('Username and Password is required.')
                 api.abort(401, errors='Username and Password is required.')
 
-            token = facade.auth(username, password)
+            token = facade.create_token(username, password)
             return token, 200
 
         except exceptions.Unauthorized:
@@ -54,5 +55,9 @@ class CreateAuth(Resource):
             api.abort(401, 'User not Unauthorized.')
 
         except exceptions.AuthException:
+            app.logger.error('Auth Unavailable.')
+            api.abort(503, 'Auth Unavailable.')
+
+        except AuthException:
             app.logger.error('Auth Unavailable.')
             api.abort(503, 'Auth Unavailable.')

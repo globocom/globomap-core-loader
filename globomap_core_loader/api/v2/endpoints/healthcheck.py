@@ -17,11 +17,10 @@ import flask
 import six
 from flask import current_app as app
 from flask_restplus import Resource
-from globomap_auth_manager.auth import Auth
 
 from globomap_core_loader.api.facade import LoaderAPIFacade
 from globomap_core_loader.api.v2 import api
-from globomap_core_loader.api.v2.auth.facade import set_config_redis
+from globomap_core_loader.api.v2.auth.facade import Auth
 
 
 ns = api.namespace(
@@ -75,11 +74,15 @@ def _is_rabbitmq_ok():
     return status
 
 
-def _is_redis_ok():
+def _is_auth_ok():
     auth_inst = Auth()
-    set_config_redis(auth_inst)
+
+    status = True
+    if auth_inst.is_enable():
+        status = auth_inst.is_url_ok()
+
     status = {
-        'status': auth_inst.redis.is_redis_ok()
+        'status': status
     }
 
     return status
@@ -87,7 +90,7 @@ def _is_redis_ok():
 
 def _list_deps():
     deps = {
-        'redis': _is_redis_ok(),
+        'auth': _is_auth_ok(),
         'rabbitmq': _is_rabbitmq_ok()
     }
 
