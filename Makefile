@@ -50,7 +50,7 @@ deploy_api:
 
 deploy_loader:
 	@cp Procfile_loader Procfile
-	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_loader.py
+	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_loader.py .python-version
 	@rm Procfile
 
 deploy_reset_loader:

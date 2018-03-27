@@ -17,7 +17,7 @@ import importlib
 import json
 import logging
 import time
-from threading import Thread
+from multiprocessing import Process
 
 from pika.exceptions import ConnectionClosed
 
@@ -29,7 +29,7 @@ from globomap_core_loader.loader.globomap import GloboMapException
 from globomap_core_loader.rabbitmq import RabbitMQClient
 from globomap_core_loader.settings import DRIVER_FETCH_INTERVAL
 from globomap_core_loader.settings import DRIVERS
-from globomap_core_loader.settings import GLOBOMAP_API_ADDRESS
+from globomap_core_loader.settings import GLOBOMAP_API_URL
 from globomap_core_loader.settings import GLOBOMAP_RMQ_ERROR_EXCHANGE
 from globomap_core_loader.settings import GLOBOMAP_RMQ_HOST
 from globomap_core_loader.settings import GLOBOMAP_RMQ_PASSWORD
@@ -45,13 +45,14 @@ class CoreLoader(object):
     def __init__(self, driver_name=None):
         self.log.info('Starting Globmap loader')
         self.drivers = self._load_drivers(driver_name)
-        self.globomap_client = GloboMapClient(GLOBOMAP_API_ADDRESS)
+        self.globomap_client = GloboMapClient(GLOBOMAP_API_URL)
 
     def load(self):
         for driver in self.drivers:
-            DriverWorker(
+            p = DriverWorker(
                 self.globomap_client, driver, UpdateExceptionHandler()
-            ).start()
+            )
+            p.start()
 
     def full_load(self):
         for driver in self.drivers:
@@ -105,7 +106,7 @@ class CoreLoader(object):
             return driver_type()
 
 
-class DriverWorker(Thread):
+class DriverWorker(Process):
     """
     Worker bound to a driver instance that processes all the messages
     provided by the driver and then sleeps for the amount of seconds
@@ -115,7 +116,7 @@ class DriverWorker(Thread):
     log = logging.getLogger(__name__)
 
     def __init__(self, globomap_client, driver, exception_handler):
-        Thread.__init__(self)
+        Process.__init__(self)
         self.session = Session()
         self.name = driver.__class__.__name__
         self.globomap_client = globomap_client
@@ -123,12 +124,13 @@ class DriverWorker(Thread):
         self.exception_handler = exception_handler
 
     def run(self):
+        print('called run method in process: %s' % self.name)
         while True:
             try:
                 self.driver.process_updates(self._process_update)
             except Exception:
                 self.log.exception(
-                    'Error syncing updates from driver %s' % self.driver
+                    'Error syncing updates from driver {}'.format(self.driver)
                 )
             finally:
                 self.log.debug('No more updates found')
@@ -149,7 +151,7 @@ class DriverWorker(Thread):
                 update.get('key'),
             )
             self.update_job_success(update.get('jobid'))
-        except GloboMapException, e:
+        except GloboMapException as e:
             self.log.error('Could not process update: %s' % update)
             self.log.error('Status code: %s' % e.status_code)
             self.log.error('Response body: %s' % e.response)
@@ -192,7 +194,7 @@ class DriverWorker(Thread):
                 self.log.error('Job with id %s not found' % job_id)
 
 
-class DriverFullLoadWorker(Thread):
+class DriverFullLoadWorker(Process):
     """
     Worker bound to a driver instance that runs the 'full_load'
     method on the driver. This method must take care of all processing
@@ -203,7 +205,7 @@ class DriverFullLoadWorker(Thread):
     log = logging.getLogger(__name__)
 
     def __init__(self, driver):
-        Thread.__init__(self)
+        Process.__init__(self)
         self.name = driver.__class__.__name__
         self.driver = driver
 
