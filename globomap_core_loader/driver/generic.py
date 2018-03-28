@@ -61,6 +61,7 @@ class GenericDriver(object):
                 self.log.exception(
                     'Error connecting to RabbitMQ, reconnecting')
                 self._connect_rabbitmq()
-            except:
+            except Exception as err:
+                print(delivery_tag)
                 self.rabbitmq.nack_message(delivery_tag)
                 raise

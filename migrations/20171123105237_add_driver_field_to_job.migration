@@ -1,8 +1,0 @@
-#-*- coding:utf-8 -*-
-SQL_UP = u"""
-ALTER TABLE job ADD driver VARCHAR(50) NULL DEFAULT '*';
-"""
-
-SQL_DOWN = u"""
-ALTER TABLE job DROP COLUMN driver;
-"""

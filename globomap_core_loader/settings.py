@@ -49,25 +49,25 @@ LOADER_UPDATE = 'globomap_loader_update'
 DRIVERS = [
     {'package': 'globomap_core_loader.driver.generic',
         'class': 'GenericDriver', 'factor': int(os.getenv('FACTOR', 1))},
-    {'package': 'globomap_driver_napi.driver', 'class': 'Napi', 'factor': 1},
-    {
-        'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
-        'params': {
-            'env': 'CTA'
-        }, 'factor': 1
-    },
-    {
-        'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
-        'params': {
-            'env': 'DEV'
-        }, 'factor': 1
-    },
-    {
-        'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
-        'params': {
-            'env': 'CME'
-        }, 'factor': 1
-    }
+    # {'package': 'globomap_driver_napi.driver', 'class': 'Napi', 'factor': 1},
+    # {
+    #     'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
+    #     'params': {
+    #         'env': 'CTA'
+    #     }, 'factor': 1
+    # },
+    # {
+    #     'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
+    #     'params': {
+    #         'env': 'DEV'
+    #     }, 'factor': 1
+    # },
+    # {
+    #     'package': 'globomap_driver_acs.driver', 'class': 'Cloudstack',
+    #     'params': {
+    #         'env': 'CME'
+    #     }, 'factor': 1
+    # }
 ]
 
 SPECS = {

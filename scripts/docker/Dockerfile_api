@@ -24,4 +24,6 @@ ADD . /app
 
 WORKDIR /app
 RUN export LC_CTYPE=UTF-8
-RUN pip install -r requirements_test.txt --index-url=https://artifactory.globoi.com/artifactory/api/pypi/pypi-all/simple
+RUN pip install -r scripts/docker/requirements/requirements_api.txt
+
+CMD python3.6 migrations/manage.py version_control

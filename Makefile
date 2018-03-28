@@ -20,28 +20,28 @@ clean:
 
 compile: clean
 	@echo "Compiling source code..."
-	@python -tt -m compileall .
+	@python3.6 -tt -m compileall .
 	@pep8 --format=pylint --statistics loader driver api
 
 tests: export ENV=test
 
 tests: clean compile
-	@python -m unittest discover -s tests/
+	@python3.6 -m unittest discover -s tests/
 
 setup: requirements.txt
 	$(PIP) install -r $^
 
 run_migrations:
-	db-migrate --config=migrations/migrations.conf
+	@python3.6 migrations/manage.py upgrade
 
-run_loader: run_migrations
-	@python run_loader.py $(module)
+run_loader:
+	@python3.6 run_loader.py $(module)
 
 run_reset_loader:
-	@python run_reset_loader.py
+	@python3.6 run_reset_loader.py
 
-run_api: run_migrations
-	@python run_api.py
+run_api:
+	@python3.6 run_api.py
 
 deploy_api:
 	@cp Procfile_api Procfile

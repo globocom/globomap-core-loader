@@ -1,1 +1,0 @@
-web: gunicorn -b 0.0.0.0:$PORT globomap_core_loader.api.wsgi -w 4 --log-level WARNING

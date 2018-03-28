@@ -1,8 +1,0 @@
-#-*- coding:utf-8 -*-
-SQL_UP = u"""
-ALTER TABLE job_error MODIFY request_body TEXT;
-"""
-
-SQL_DOWN = u"""
-ALTER TABLE job_error MODIFY request_body varchar(1024);
-"""
