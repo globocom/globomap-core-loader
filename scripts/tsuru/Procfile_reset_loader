@@ -1,0 +1,1 @@
+worker: python scheduler_reset_loader.py

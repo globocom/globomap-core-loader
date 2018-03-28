@@ -23,13 +23,8 @@ compile: clean
 	@python3.6 -tt -m compileall .
 	@pep8 --format=pylint --statistics loader driver api
 
-tests: export ENV=test
-
 tests: clean compile
 	@python3.6 -m unittest discover -s tests/
-
-setup: requirements.txt
-	$(PIP) install -r $^
 
 run_migrations:
 	@python3.6 migrations/manage.py upgrade
@@ -44,19 +39,23 @@ run_api:
 	@python3.6 run_api.py
 
 deploy_api:
-	@cp Procfile_api Procfile
+	@cp scripts/tsuru/Procfile_api Procfile
+	@cp scripts/docker/requirements/requirements_api.txt requirements.txt
 	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_api.py
 	@rm Procfile
+	@rm requirements.txt
 
 deploy_loader:
-	@cp Procfile_loader Procfile
+	@cp scripts/tsuru/Procfile_loader Procfile
+	@cp scripts/docker/requirements/requirements_loader.txt requirements.txt
 	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_loader.py .python-version
 	@rm Procfile
+	@rm requirements.txt
 
-deploy_reset_loader:
-	@cp Procfile_reset_loader Procfile
-	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_reset_loader.py
-	@rm Procfile
+# deploy_reset_loader:
+# 	@cp scripts/tsuru/Procfile_reset_loader Procfile
+# 	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_reset_loader.py
+# 	@rm Procfile
 
 docker: ## Run a development web server
 	@docker-compose build

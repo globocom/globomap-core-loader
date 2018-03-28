@@ -1,0 +1,4 @@
+worker1: python run_loader.py
+worker2: python run_loader.py
+worker3: python run_loader.py
+worker4: python run_loader.py
