@@ -41,16 +41,20 @@ run_api:
 deploy_api:
 	@cp scripts/tsuru/Procfile_api Procfile
 	@cp scripts/docker/requirements/requirements_api.txt requirements.txt
-	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_api.py
+	@cp scripts/run_loader.py run_api.py
+	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_api.py .python-version
 	@rm Procfile
 	@rm requirements.txt
+	@rm run_api.py
 
 deploy_loader:
 	@cp scripts/tsuru/Procfile_loader Procfile
 	@cp scripts/docker/requirements/requirements_loader.txt requirements.txt
+	@cp scripts/run_loader.py run_loader.py
 	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_loader.py .python-version
 	@rm Procfile
 	@rm requirements.txt
+	@rm run_loader.py
 
 # deploy_reset_loader:
 # 	@cp scripts/tsuru/Procfile_reset_loader Procfile

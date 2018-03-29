@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
    Copyright 2017 Globo.com
 
@@ -59,7 +60,7 @@ class CoreLoader(object):
             DriverFullLoadWorker(driver).start()
 
     def _load_drivers(self, driver_name=None):
-        self.log.info('Loading drivers: %s' % DRIVERS)
+        self.log.info('Loading drivers: %s', DRIVERS)
         drivers = []
         for driver_config in DRIVERS:
             package = driver_config['package']
@@ -76,14 +77,14 @@ class CoreLoader(object):
                         driver_class, package, driver_config.get('params')
                     )
                     drivers.append(driver_instance)
-                    self.log.info("Driver '%s' loaded" % driver_class)
+                    self.log.info('Driver "%s" loaded', driver_class)
                 except AttributeError:
-                    self.log.exception('Cannot load driver %s' % driver_class)
+                    self.log.exception('Cannot load driver %s', driver_class)
                 except ImportError:
-                    self.log.exception('Cannot load driver %s' % driver_class)
+                    self.log.exception('Cannot load driver %s', driver_class)
                 except Exception:
                     self.log.exception(
-                        'Unknown error loading driver %s' % driver_config
+                        'Unknown error loading driver %s', driver_config
                     )
                 finally:
                     Session.remove()
@@ -124,14 +125,13 @@ class DriverWorker(Process):
         self.exception_handler = exception_handler
 
     def run(self):
-        print('called run method in process: %s' % self.name)
+        self.log.info('called run method in process: %s', self.name)
         while True:
             try:
                 self.driver.process_updates(self._process_update)
             except Exception:
                 self.log.exception(
-                    'Error syncing updates from driver {}'.format(self.driver)
-                )
+                    'Error syncing updates from driver %s', self.driver)
             finally:
                 self.log.debug('No more updates found')
                 self.log.debug('Sleeping for %ss' % DRIVER_FETCH_INTERVAL)
@@ -141,8 +141,8 @@ class DriverWorker(Process):
     def _process_update(self, update):
         try:
             if update.get('jobid'):
-                self.log.info('Processing update from JOB %s' %
-                              update.get('jobid'))
+                self.log.info(
+                    'Processing update from JOB %s', update.get('jobid'))
             self.globomap_client.update_element_state(
                 update['action'],
                 update['type'],
@@ -152,9 +152,9 @@ class DriverWorker(Process):
             )
             self.update_job_success(update.get('jobid'))
         except GloboMapException as e:
-            self.log.error('Could not process update: %s' % update)
-            self.log.error('Status code: %s' % e.status_code)
-            self.log.error('Response body: %s' % e.message)
+            self.log.error('Could not process update: %s', update)
+            self.log.error('Status code: %s', e.status_code)
+            self.log.error('Response body: %s', e.message)
 
             try:
                 self.update_job_error(update.get('jobid'), update, e)
@@ -178,7 +178,7 @@ class DriverWorker(Process):
                 job.increment_success_count()
                 job.save()
             else:
-                self.log.error('Job with id %s not found' % job_id)
+                self.log.error('Job with id %s not found', job_id)
 
     def update_job_error(self, job_id, update, err):
 
@@ -191,7 +191,7 @@ class DriverWorker(Process):
                 job.add_error(err)
                 job.save()
             else:
-                self.log.error('Job with id %s not found' % job_id)
+                self.log.error('Job with id %s not found', job_id)
 
 
 class DriverFullLoadWorker(Process):
@@ -218,8 +218,7 @@ class DriverFullLoadWorker(Process):
                 self.log.error("Driver does not implement 'full_load' method")
         except Exception:
             self.log.exception(
-                'Error syncing updates from driver %s' % self.driver
-            )
+                'Error syncing updates from driver %s', self.driver)
         return
 
 
@@ -240,7 +239,7 @@ class UpdateExceptionHandler(object):
         try:
             self.log.debug('Sending failing update to rabbitmq error queue')
             collection = update.get('collection')
-            key = 'globomap.error.%s.%s' % (driver_name, collection)
+            key = 'globomap.error.{}.{}'.format(driver_name, collection)
             self.rabbit_mq.post_message(
                 GLOBOMAP_RMQ_ERROR_EXCHANGE,
                 key,
