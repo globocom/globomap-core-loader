@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
    Copyright 2017 Globo.com
 
@@ -65,7 +66,6 @@ class Updates(Resource):
 
         try:
             updates = request.get_json()
-
             spec = SPECS.get('updates')
             util.json_validate(spec).validate(updates)
             driver_name = request.headers.get('X-DRIVER-NAME', '*')

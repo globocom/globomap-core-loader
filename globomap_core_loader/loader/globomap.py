@@ -57,7 +57,7 @@ class GloboMapClient(object):
         except exceptions.ValidationError as err:
             self.logger.error(
                 'Bad request in send element %s %s %s %s %s',
-                action, type, collection, element, key
+                action, type, collection, element.encode('ascii'), key
             )
             raise GloboMapException(err.message, err.status_code)
 

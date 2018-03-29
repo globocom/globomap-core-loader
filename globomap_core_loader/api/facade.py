@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
    Copyright 2017 Globo.com
 
@@ -48,10 +49,9 @@ class LoaderAPIFacade(object):
                     update.update(
                         {'driver_name': driver_name, 'jobid': job.uuid}
                     )
-
                     self.rabbitmq.post_message(
                         GLOBOMAP_RMQ_EXCHANGE, GLOBOMAP_RMQ_KEY,
-                        json.dumps(update), False
+                        json.dumps(update, ensure_ascii=False), False
                     )
 
                 job.save()
