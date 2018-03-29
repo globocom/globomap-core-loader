@@ -118,7 +118,7 @@ LOGGING = {
     'formatters': {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s %(process)d ' +
-            '%(thread)d %(message)s'
+            '%(thread)d %(message)s %(line)s'
         }
     },
     'handlers': {

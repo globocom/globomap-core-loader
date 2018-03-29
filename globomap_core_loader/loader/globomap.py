@@ -55,16 +55,16 @@ class GloboMapClient(object):
 
         except exceptions.ValidationError as err:
             self.logger.error(
-                'Bad request in send element %s %s %s %s %s' %
-                (action, type, collection, element, key)
+                'Bad request in send element %s %s %s %s %s',
+                action, type, collection, element, key
             )
-            raise GloboMapException(err.status_code, err.message)
+            raise GloboMapException(err.message, err.status_code)
 
         except exceptions.Unauthorized as err:
             if retries < 3:
                 self.logger.warning(
-                    'Retry action %s %s %s %s %s' %
-                    (action, type, collection, element, key)
+                    'Retry action %s %s %s %s %s',
+                    action, type, collection, element, key
                 )
                 retries += 1
                 self.generate_auth()
@@ -72,38 +72,41 @@ class GloboMapClient(object):
                     action, type, collection, element, key, retries)
             else:
                 self.logger.error(
-                    'Error send element %s %s %s %s %s' %
-                    (action, type, collection, element, key)
+                    'Error send element %s %s %s %s %s',
+                    action, type, collection, element, key
                 )
-                raise GloboMapException(err.status_code, err.message)
+                raise GloboMapException(err.message, err.status_code)
 
         except exceptions.Forbidden as err:
             self.logger.error(
-                'Forbbiden send element %s %s %s %s %s' %
-                (action, type, collection, element, key)
+                'Forbbiden send element %s %s %s %s %s',
+                action, type, collection, element, key
             )
-            raise GloboMapException(err.status_code, err.message)
+            raise GloboMapException(err.message, err.status_code)
 
         except exceptions.ApiError as err:
 
             if err.status_code in (502, 503) and retries < 3:
                 self.logger.warning(
-                    'Retry send element %s %s %s %s %s' %
-                    (action, type, collection, element, key)
+                    'Retry send element %s %s %s %s %s',
+                    action, type, collection, element, key
                 )
                 retries += 1
                 self.update_element_state(
                     action, type, collection, element, key, retries)
             else:
                 self.logger.error(
-                    'Error send element %s %s %s %s %s' %
-                    (action, type, collection, element, key)
+                    'Error send element %s %s %s %s %s',
+                    action, type, collection, element, key
                 )
-                raise GloboMapException(err.status_code, err.message)
+                raise GloboMapException(err.message, err.status_code)
 
     def create(self, type, collection, payload):
         try:
             return self.doc.post(type, collection, payload)
+
+        except exceptions.NotFound as err:
+            raise GloboMapException(err.message, err.status_code)
 
         except exceptions.DocumentAlreadyExists:
             self.logger.warning('Element already insered')
@@ -127,7 +130,7 @@ class GloboMapClient(object):
             return self.doc.delete(type, collection, key)
 
         except exceptions.NotFound:
-            self.logger.warning('Element %s already deleted' % key)
+            self.logger.warning('Element %s already deleted', key)
 
     def clear(self, type, collection, payload):
         return self.doc.clear(type, collection, payload)
@@ -135,6 +138,8 @@ class GloboMapClient(object):
 
 class GloboMapException(Exception):
 
-    def __init__(self, status_code, response):
+    def __init__(self, message, status_code):
+        super(GloboMapException, self).__init__(message, status_code)
+
+        self.message = message
         self.status_code = status_code
-        self.response = response

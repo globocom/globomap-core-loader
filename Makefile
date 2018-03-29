@@ -30,13 +30,13 @@ run_migrations:
 	@python3.6 migrations/manage.py upgrade
 
 run_loader:
-	@python3.6 run_loader.py $(module)
+	@python3.6 scripts/run_loader.py $(module)
 
 run_reset_loader:
-	@python3.6 run_reset_loader.py
+	@python3.6 scripts/run_reset_loader.py
 
 run_api:
-	@python3.6 run_api.py
+	@python3.6 scripts/run_api.py
 
 deploy_api:
 	@cp scripts/tsuru/Procfile_api Procfile

@@ -1,3 +1,4 @@
+# !/usr/bin/env python
 """
    Copyright 2017 Globo.com
 
@@ -13,19 +14,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-# !/usr/bin/env python
 import logging
 import sys
 
 from globomap_core_loader.loader.loader import CoreLoader
-# from globomap_core_loader.settings import LOGGING
-# from logging import config
 
 if __name__ == '__main__':
 
     logging.basicConfig(
         level=logging.INFO,
-        format='time=%(asctime)s level=%(levelname)s msg=%(message)s file=%(name)s',
+        format='time=%(asctime)s level=%(levelname)s msg=%(message)s file=%(name)s lineno=%(lineno)s',
         stream=sys.stdout
     )
 

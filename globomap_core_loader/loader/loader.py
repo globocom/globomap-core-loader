@@ -154,13 +154,13 @@ class DriverWorker(Process):
         except GloboMapException as e:
             self.log.error('Could not process update: %s' % update)
             self.log.error('Status code: %s' % e.status_code)
-            self.log.error('Response body: %s' % e.response)
+            self.log.error('Response body: %s' % e.message)
 
             try:
                 self.update_job_error(update.get('jobid'), update, e)
 
                 update['status'] = e.status_code
-                update['error_msg'] = e.response
+                update['error_msg'] = e.message
                 name = update.get('driver_name', self.name)
 
                 self.exception_handler.handle_exception(name, update)
@@ -186,7 +186,7 @@ class DriverWorker(Process):
             job = Job.find_by_uuid(job_id, for_update=True)
             if job:
                 err = JobError(
-                    json.dumps(update), err.response, err.status_code
+                    json.dumps(update), err.message, err.status_code
                 )
                 job.add_error(err)
                 job.save()
