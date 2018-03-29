@@ -1,5 +1,5 @@
 """
-   Copyright 2017 Globo.com
+   Copyright 2018 Globo.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ def json_validate(json_file):
 
 
 def validate(error):
-    msg = list()
+    msg = []
     if error.flatten():
         for pointer, reasons in error.flatten().items():
             msg.append({

@@ -1,5 +1,5 @@
 """
-   Copyright 2017 Globo.com
+   Copyright 2018 Globo.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ def open_json(json_file):
     with open(json_file) as data_file:
         data = json.load(data_file)
         return data
+
 
 def as_json(object):
     return json.dumps(object)
