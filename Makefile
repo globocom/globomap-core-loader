@@ -23,8 +23,9 @@ compile: clean
 	@python3.6 -tt -m compileall globomap_core_loader
 	@pycodestyle --format=pylint --statistics globomap_core_loader
 
-test: clean
+tests: clean
 	@echo "Running tests..."
+	@export ENV=test
 	@nosetests --verbose --rednose  --nocapture --cover-package=globomap_core_loader --with-coverage
 
 run_migrations:
