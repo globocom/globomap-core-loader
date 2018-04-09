@@ -17,7 +17,7 @@
 import logging
 import sys
 
-from globomap_core_loader.loader import CoreLoader
+from globomap_core_loader.loader.loader import CoreLoader
 
 if __name__ == '__main__':
 

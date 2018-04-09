@@ -20,22 +20,26 @@ clean:
 
 compile: clean
 	@echo "Compiling source code..."
-	@python3.6 -tt -m compileall .
-	@pep8 --format=pylint --statistics loader driver api
+	@python3.6 -tt -m compileall globomap_core_loader
+	@pycodestyle --format=pylint --statistics globomap_core_loader
 
-tests: clean compile
-	@python3.6 -m unittest discover -s tests/
+test: clean
+	@echo "Running tests..."
+	@nosetests --verbose --rednose  --nocapture --cover-package=globomap_core_loader --with-coverage
 
 run_migrations:
+	@echo "Running migrations..."
 	@python3.6 migrations/manage.py upgrade
 
 run_loader:
+	@echo "Running loader..."
 	@python3.6 scripts/run_loader.py $(module)
 
 run_reset_loader:
 	@python3.6 scripts/run_reset_loader.py
 
-run_api:
+run_api: run_migrations
+	@echo "Running api..."
 	@python3.6 scripts/run_api.py
 
 deploy_api:

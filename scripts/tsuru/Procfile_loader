@@ -2,3 +2,9 @@ worker1: python run_loader.py
 worker2: python run_loader.py
 worker3: python run_loader.py
 worker4: python run_loader.py
+worker5: python run_loader.py
+worker6: python run_loader.py
+worker7: python run_loader.py
+worker8: python run_loader.py
+worker9: python run_loader.py
+worker10: python run_loader.py
