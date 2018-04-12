@@ -16,7 +16,7 @@ All of the environment variables below must be set for the application to work p
 | Variable                    | Description                                                        | Example                      |
 |-----------------------------|--------------------------------------------------------------------|------------------------------|
 | DRIVER_FETCH_INTERVAL       | Interval in seconds on which the updates are fetched from a driver | 60 (default)                 |
-| GLOBOMAP_API_ADDRESS        | Globo Map API address                                              | http://globomap.domain.com   |
+| GLOBOMAP_API_URL            | Globo Map API address                                              | http://globomap.domain.com   |
 | GLOBOMAP_RMQ_HOST           | RabbitMQ host                                                      | rabbitmq.yourdomain.com      |
 | GLOBOMAP_RMQ_PORT           | RabbitMQ port                                                      | 5672 (default)               |
 | GLOBOMAP_RMQ_USER           | RabbitMQ user                                                      | user-name                    |

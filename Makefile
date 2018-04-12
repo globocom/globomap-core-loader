@@ -6,44 +6,46 @@ PIP := $(shell which pip)
 help:
 	@echo
 	@echo "Please use 'make <target>' where <target> is one of"
-	@echo "  clean      to clean garbage left by builds and installation"
-	@echo "  compile    to compile .py files (just to check for syntax errors)"
-	@echo "  test       to execute all tests"
-	@echo "  run        to run the loader app"
-	@echo "  run_api    to run the loader api app"
 	@echo
 
-clean:
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+clean: ## Clear *.pyc files, etc
 	@echo "Cleaning project ..."
 	@rm -rf build dist *.egg-info
 	@find . \( -name '*.pyc' -o  -name '__pycache__' -o -name '**/*.pyc' -o -name '*~' \) -delete
 
-compile: clean
+compile: clean ## Compile source code
 	@echo "Compiling source code..."
 	@python3.6 -tt -m compileall globomap_core_loader
 	@pycodestyle --format=pylint --statistics globomap_core_loader
 
-tests: clean
+tests: clean ## Run tests
 	@echo "Running tests..."
 	@export ENV=test
 	@nosetests --verbose --rednose  --nocapture --cover-package=globomap_core_loader --with-coverage
 
-run_migrations:
+run_version_control: ## Run version control
+	@echo "Running version control..."
+	@python3.6 migrations/manage.py version_control || true
+
+run_migrations: run_version_control ## Run migrations
 	@echo "Running migrations..."
 	@python3.6 migrations/manage.py upgrade
 
-run_loader:
+run_loader: run_migrations ## Run the loader
 	@echo "Running loader..."
 	@python3.6 scripts/run_loader.py $(module)
 
-run_reset_loader:
+run_reset_loader: ## Run the reset loader app
+	@echo "Running reset loader..."
 	@python3.6 scripts/run_reset_loader.py
 
-run_api: run_migrations
+run_api: run_migrations ## Run the loader API app
 	@echo "Running api..."
 	@python3.6 scripts/run_api.py
 
-deploy_api:
+deploy_api: ## Deploy API
 	@cp scripts/tsuru/Procfile_api Procfile
 	@cp scripts/docker/requirements/requirements_api.txt requirements.txt
 	@cp scripts/run_loader.py run_api.py
@@ -52,7 +54,7 @@ deploy_api:
 	@rm requirements.txt
 	@rm run_api.py
 
-deploy_loader:
+deploy_loader: ## Deploy Loader
 	@cp scripts/tsuru/Procfile_loader Procfile
 	@cp scripts/docker/requirements/requirements_loader.txt requirements.txt
 	@cp scripts/run_loader.py run_loader.py
@@ -67,5 +69,6 @@ deploy_loader:
 # 	@rm Procfile
 
 docker: ## Run a development web server
+	@echo "Running docker..."
 	@docker-compose build
 	@docker-compose up -d

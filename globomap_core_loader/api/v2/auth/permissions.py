@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
    Copyright 2018 Globo.com
 
@@ -26,11 +25,11 @@ class BasePermission(object):
         self.auth = auth
         self.validate_token()
 
-    def has_permission(self):
+    def has_permission(self, token=None):
         return True
 
     def has_perm(self, token, role):
-        roles = [usr_role['name'] for usr_role in token['user']['roles']]
+        roles = [usr_role['name'] for usr_role in token['roles']]
         if role in roles:
             return True
         return False
