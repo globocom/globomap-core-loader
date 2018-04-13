@@ -1,4 +1,4 @@
-# globomap-core-loader
+# GloboMap Core Loader
 
 Application responsible for reading connected applications events and apply them to the [Globo Map API](https://github.com/globocom/globomap-api).
 This application makes use of decoupled drivers for reading and transforming sources' information and make
@@ -9,6 +9,25 @@ Drivers:
 [Network API driver](https://github.com/globocom/globomap-driver-napi)
 
 [Cloudstack driver](https://github.com/globocom/globomap-driver-acs)
+
+## Starting Project:
+
+` make docker `
+
+## Running Tests:
+
+` make docker ` (When project not started yet.)<br>
+` make tests `
+
+## Deploy in Tsuru:
+
+### API
+
+` make deploy_api project=<name of project> `<br>
+
+### Loader
+
+` make deploy_loader project=<name of project> `<br>
 
 ## Environment variables configuration
 All of the environment variables below must be set for the application to work properly.
@@ -64,3 +83,7 @@ All of the environment variables below must be set for the application to work p
 
  ## API
 [Documentation](https://github.com/globocom/globomap-core-loader/blob/master/doc/api.md)
+
+## Licensing
+
+GloboMap Core Loader is under [Apache 2 License](./LICENSE)

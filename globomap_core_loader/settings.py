@@ -67,65 +67,33 @@ SPECS = {
     'updates': 'globomap_core_loader/api/specs/updates.json',
 }
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'verbose': {
-#             'format': 'U:%%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d msg"%(message)s" U:%(request_id)-6s, '
-#                       'P:%(request_path)-8s'
-#         }
-#     },
-#     # 'filters': {
-#     #     'special': {
-#     #         '()': 'api.extra_logging.filters.StaticFieldFilter',
-#     #     },
-#     #     'requestfilter': {
-#     #         '()': 'api.extra_logging.filters.RequestFilter',
-#     #     },
-#     #     'user_filter': {
-#     #         '()': 'api.extra_logging.filters.ExtraLoggingFilter',
-#     #     }
-#     # },
-#     'handlers': {
-#         'default': {
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#             'stream': 'ext://sys.stdout',
-#             'formatter': 'verbose',
-#             # 'filters': ['special', 'requestfilter', 'user_filter'],
-#         }
-#     },
-#     'loggers': {
-#         'api': {
-#             'handlers': ['default'],
-#             'level': 'DEBUG',
-#             'propagate': True
-#         },
-#         'werkzeug': {'propagate': True},
-#     }
-# }
+SENTRY_DSN = os.getenv('SENTRY_DSN')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d ' +
-            '%(thread)d %(message)s %(lineno)s'
+            'format': 'level=%(levelname)s timestamp=%(asctime)s module=%(module)s line=%(lineno)d' +
+            'message=%(message)s '
         }
     },
     'handlers': {
         'default': {
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',
             'formatter': 'verbose',
-        }
+        },
+        'sentry': {
+            'level': 'ERROR',
+            'class': 'raven.handlers.logging.SentryHandler',
+            'dsn': SENTRY_DSN,
+        },
     },
     'loggers': {
-        'api': {
-            'handlers': ['default'],
-            'level': 'DEBUG',
+        '': {
+            'handlers': ['default', 'sentry'],
+            'level': 'WARNING',
             'propagate': True
         },
         'werkzeug': {'propagate': True},

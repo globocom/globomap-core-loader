@@ -13,11 +13,5 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import logging
-
 from globomap_core_loader.api.app import create_app
-from globomap_core_loader.settings import LOGGING
-
-logging.config.dictConfig(LOGGING)
-
 application = create_app()

@@ -6,6 +6,6 @@ gunicorn==19.7.1
 json-spec==0.10.1
 mysqlclient==1.3.12
 pika==0.11.2
-requests==2.10.0
+raven==6.6.0requests==2.10.0
 SQLAlchemy==1.0.14
 sqlalchemy-migrate==0.11.0

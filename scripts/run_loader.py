@@ -14,18 +14,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import logging
 import sys
+from logging import config
 
 from globomap_core_loader.loader.loader import CoreLoader
+from globomap_core_loader.settings import LOGGING
 
 if __name__ == '__main__':
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format='time=%(asctime)s level=%(levelname)s msg=%(message)s file=%(name)s lineno=%(lineno)s',
-        stream=sys.stdout
-    )
+    config.dictConfig(LOGGING)
 
     driver_class_name = sys.argv[1] if len(sys.argv) > 1 else None
     CoreLoader(driver_class_name).load()
