@@ -19,8 +19,8 @@ from globomap_api_client import auth
 from globomap_api_client import exceptions
 from globomap_api_client.document import Document
 
-from globomap_core_loader.settings import KEYSTONE_PASSWORD
-from globomap_core_loader.settings import KEYSTONE_USERNAME
+from globomap_core_loader.settings import GLOBOMAP_API_PASSWORD
+from globomap_core_loader.settings import GLOBOMAP_API_USERNAME
 
 
 class GloboMapClient(object):
@@ -35,8 +35,8 @@ class GloboMapClient(object):
         self.logger.info('New Auth')
         self.auth = auth.Auth(
             api_url=self.host,
-            username=KEYSTONE_USERNAME,
-            password=KEYSTONE_PASSWORD
+            username=GLOBOMAP_API_USERNAME,
+            password=GLOBOMAP_API_PASSWORD
         )
         self.doc = Document(auth=self.auth)
 
