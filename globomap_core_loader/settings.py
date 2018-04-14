@@ -94,7 +94,7 @@ LOGGING = {
         '': {
             'handlers': ['default', 'sentry'],
             'level': 'WARNING',
-            'propagate': True
+            'propagate': False
         },
         'werkzeug': {'propagate': True},
     }
