@@ -79,6 +79,7 @@ class Updates(Resource):
             app.logger.exception('Error sending updates to rabbitmq')
             api.abort(400, errors=util.validate(error))
         except BadRequest as err:
+            app.logger.exception('Error sending updates to rabbitmq')
             api.abort(400, errors=err.description)
         except:
             app.logger.exception('Error sending updates to rabbitmq')

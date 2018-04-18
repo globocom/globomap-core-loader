@@ -27,9 +27,10 @@ from globomap_core_loader.settings import GLOBOMAP_RMQ_USER
 from globomap_core_loader.settings import GLOBOMAP_RMQ_VIRTUAL_HOST
 
 
-class LoaderAPIFacade(object):
+logger = logging.getLogger(__name__)
 
-    log = logging.getLogger(__name__)
+
+class LoaderAPIFacade(object):
 
     def __init__(self):
         self.rabbitmq = self._get_rabbit_mq_client()
@@ -57,6 +58,6 @@ class LoaderAPIFacade(object):
                 self.rabbitmq.confirm_publish()
                 return job.uuid
             except:
-                self.log.exception('Error publishing to rabbitmq')
+                logger.exception('Error publishing to rabbitmq')
                 self.rabbitmq.discard_publish()
                 raise Exception('Failed to sendo updates to queue')

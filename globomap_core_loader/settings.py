@@ -73,7 +73,7 @@ LOGGING = {
     'disable_existing_loggers': True,
     'formatters': {
         'verbose': {
-            'format': 'level=%(levelname)s timestamp=%(asctime)s module=%(module)s line=%(lineno)d' +
+            'format': 'level=%(levelname)s timestamp=%(asctime)s module=%(name)s line=%(lineno)d ' +
             'message=%(message)s '
         }
     },
@@ -91,11 +91,15 @@ LOGGING = {
         },
     },
     'loggers': {
-        '': {
+        'globomap_loader_api': {
             'handlers': ['default', 'sentry'],
             'level': 'WARNING',
             'propagate': False
         },
-        'werkzeug': {'propagate': True},
+        'globomap_core_loader': {
+            'handlers': ['default', 'sentry'],
+            'level': 'WARNING',
+            'propagate': False
+        }
     }
 }

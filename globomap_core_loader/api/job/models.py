@@ -29,11 +29,12 @@ from sqlalchemy.schema import ForeignKey
 from globomap_core_loader.api.database import Base
 from globomap_core_loader.api.database import Session
 
+logger = logging.getLogger(__name__)
+
 
 class Job(Base):
 
     __tablename__ = 'job'
-    log = logging.getLogger(__name__)
 
     id = Column(Integer, primary_key=True)
     uuid = Column(String(50), nullable=False)
@@ -72,7 +73,7 @@ class Job(Base):
         session.add(self)
         if self._is_completed():
             self.completed = True
-            self.log.debug('JOB %s completed' % self.uuid)
+            logger.debug('JOB %s completed' % self.uuid)
         session.commit()
         return self
 

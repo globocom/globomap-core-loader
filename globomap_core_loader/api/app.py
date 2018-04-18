@@ -27,7 +27,7 @@ def create_app():
 
     app = Flask(__name__)
     app.config['LOGGER_HANDLER_POLICY'] = 'default'
-    app.config['LOGGER_NAME'] = 'api'
+    app.config['LOGGER_NAME'] = 'globomap_loader_api'
     app.config['BUNDLE_ERRORS'] = True
     app.config.from_object('globomap_core_loader.settings')
 

@@ -23,16 +23,17 @@ from globomap_core_loader.settings import GLOBOMAP_API_PASSWORD
 from globomap_core_loader.settings import GLOBOMAP_API_USERNAME
 
 
-class GloboMapClient(object):
+logger = logging.getLogger(__name__)
 
-    logger = logging.getLogger(__name__)
+
+class GloboMapClient(object):
 
     def __init__(self, host):
         self.host = host
         self.generate_auth()
 
     def generate_auth(self):
-        self.logger.info('New Auth')
+        logger.info('New Auth')
         self.auth = auth.Auth(
             api_url=self.host,
             username=GLOBOMAP_API_USERNAME,
@@ -54,7 +55,7 @@ class GloboMapClient(object):
                 return self.clear(type, collection, element)
 
         except exceptions.ValidationError as err:
-            self.logger.error(
+            logger.error(
                 'Bad request in send element %s %s %s %s %s',
                 action, type, collection, element.encode('ascii'), key
             )
@@ -62,7 +63,7 @@ class GloboMapClient(object):
 
         except exceptions.Unauthorized as err:
             if retries < 3:
-                self.logger.warning(
+                logger.warning(
                     'Retry action %s %s %s %s %s',
                     action, type, collection, element, key
                 )
@@ -71,14 +72,14 @@ class GloboMapClient(object):
                 self.update_element_state(
                     action, type, collection, element, key, retries)
             else:
-                self.logger.error(
+                logger.error(
                     'Error send element %s %s %s %s %s',
                     action, type, collection, element, key
                 )
                 raise GloboMapException(err.message, err.status_code)
 
         except exceptions.Forbidden as err:
-            self.logger.error(
+            logger.error(
                 'Forbbiden send element %s %s %s %s %s',
                 action, type, collection, element, key
             )
@@ -87,7 +88,7 @@ class GloboMapClient(object):
         except exceptions.ApiError as err:
 
             if err.status_code in (502, 503) and retries < 3:
-                self.logger.warning(
+                logger.warning(
                     'Retry send element %s %s %s %s %s',
                     action, type, collection, element, key
                 )
@@ -95,7 +96,7 @@ class GloboMapClient(object):
                 self.update_element_state(
                     action, type, collection, element, key, retries)
             else:
-                self.logger.error(
+                logger.error(
                     'Error send element %s %s %s %s %s',
                     action, type, collection, element, key
                 )
@@ -109,7 +110,7 @@ class GloboMapClient(object):
             raise GloboMapException(err.message, err.status_code)
 
         except exceptions.DocumentAlreadyExists:
-            self.logger.warning('Element already insered')
+            logger.warning('Element already insered')
 
     def update(self, type, collection, key, payload):
         try:
@@ -130,7 +131,7 @@ class GloboMapClient(object):
             return self.doc.delete(type, collection, key)
 
         except exceptions.NotFound:
-            self.logger.warning('Element %s already deleted', key)
+            logger.warning('Element %s already deleted', key)
 
     def clear(self, type, collection, payload):
         return self.doc.clear(type, collection, payload)

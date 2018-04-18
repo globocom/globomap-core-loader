@@ -27,9 +27,10 @@ from globomap_core_loader.settings import GLOBOMAP_RMQ_USER
 from globomap_core_loader.settings import GLOBOMAP_RMQ_VIRTUAL_HOST
 
 
-class GenericDriver(object):
+logger = logging.getLogger(__name__)
 
-    log = logging.getLogger(__name__)
+
+class GenericDriver(object):
 
     def __init__(self):
         self._connect_rabbitmq()
@@ -58,11 +59,11 @@ class GenericDriver(object):
                 else:
                     return
             except (ConnectionClosed, ChannelClosed):
-                self.log.exception(
+                logger.exception(
                     'Error connecting to RabbitMQ, reconnecting')
                 self._connect_rabbitmq()
 
             except Exception:
-                self.log.exception('Error connecting to RabbitMQ')
+                logger.exception('Error connecting to RabbitMQ')
                 self.rabbitmq.nack_message(delivery_tag)
                 raise

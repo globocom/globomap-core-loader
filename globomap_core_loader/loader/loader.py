@@ -38,12 +38,13 @@ from globomap_core_loader.settings import GLOBOMAP_RMQ_USER
 from globomap_core_loader.settings import GLOBOMAP_RMQ_VIRTUAL_HOST
 
 
+logger = logging.getLogger(__name__)
+
+
 class CoreLoader(object):
 
-    log = logging.getLogger(__name__)
-
     def __init__(self, driver_name=None):
-        self.log.info('Starting Globmap loader')
+        logger.info('Starting Globmap loader')
         self.drivers = self._load_drivers(driver_name)
         self.globomap_client = GloboMapClient(GLOBOMAP_API_URL)
 
@@ -59,7 +60,7 @@ class CoreLoader(object):
             DriverFullLoadWorker(driver).start()
 
     def _load_drivers(self, driver_name=None):
-        self.log.info('Loading drivers: %s', DRIVERS)
+        logger.info('Loading drivers: %s', DRIVERS)
         drivers = []
         for driver_config in DRIVERS:
             package = driver_config['package']
@@ -76,13 +77,13 @@ class CoreLoader(object):
                         driver_class, package, driver_config.get('params')
                     )
                     drivers.append(driver_instance)
-                    self.log.info('Driver "%s" loaded', driver_class)
+                    logger.info('Driver "%s" loaded', driver_class)
                 except AttributeError:
-                    self.log.exception('Cannot load driver %s', driver_class)
+                    logger.exception('Cannot load driver %s', driver_class)
                 except ImportError:
-                    self.log.exception('Cannot load driver %s', driver_class)
+                    logger.exception('Cannot load driver %s', driver_class)
                 except Exception:
-                    self.log.exception(
+                    logger.exception(
                         'Unknown error loading driver %s', driver_config
                     )
                 finally:
@@ -113,8 +114,6 @@ class DriverWorker(Process):
     configured by the DRIVER_FETCH_INTERVAL envinroment variable.
     """
 
-    log = logging.getLogger(__name__)
-
     def __init__(self, globomap_client, driver, exception_handler):
         Process.__init__(self)
         self.session = Session()
@@ -124,23 +123,23 @@ class DriverWorker(Process):
         self.exception_handler = exception_handler
 
     def run(self):
-        self.log.info('called run method in process: %s', self.name)
+        logger.info('called run method in process: %s', self.name)
         while True:
             try:
                 self.driver.process_updates(self._process_update)
             except Exception:
-                self.log.exception(
+                logger.exception(
                     'Error syncing updates from driver %s', self.driver)
             finally:
-                self.log.debug('No more updates found')
-                self.log.debug('Sleeping for %ss' % DRIVER_FETCH_INTERVAL)
+                logger.debug('No more updates found')
+                logger.debug('Sleeping for %ss' % DRIVER_FETCH_INTERVAL)
                 Session.remove()
                 time.sleep(DRIVER_FETCH_INTERVAL)
 
     def _process_update(self, update):
         try:
             if update.get('jobid'):
-                self.log.info(
+                logger.info(
                     'Processing update from JOB %s', update.get('jobid'))
             self.globomap_client.update_element_state(
                 update['action'],
@@ -151,9 +150,9 @@ class DriverWorker(Process):
             )
             self.update_job_success(update.get('jobid'))
         except GloboMapException as e:
-            self.log.error('Could not process update: %s', update)
-            self.log.error('Status code: %s', e.status_code)
-            self.log.error('Response body: %s', e.message)
+            logger.error('Could not process update: %s', update)
+            logger.error('Status code: %s', e.status_code)
+            logger.error('Response body: %s', e.message)
 
             try:
                 self.update_job_error(update.get('jobid'), update, e)
@@ -164,7 +163,7 @@ class DriverWorker(Process):
 
                 self.exception_handler.handle_exception(name, update)
             except:
-                self.log.exception('Fail to handle update error')
+                logger.exception('Fail to handle update error')
                 self.session.rollback()
                 raise
             finally:
@@ -177,7 +176,7 @@ class DriverWorker(Process):
                 job.increment_success_count()
                 job.save()
             else:
-                self.log.error('Job with id %s not found', job_id)
+                logger.error('Job with id %s not found', job_id)
 
     def update_job_error(self, job_id, update, err):
 
@@ -190,7 +189,7 @@ class DriverWorker(Process):
                 job.add_error(err)
                 job.save()
             else:
-                self.log.error('Job with id %s not found', job_id)
+                logger.error('Job with id %s not found', job_id)
 
 
 class DriverFullLoadWorker(Process):
@@ -200,8 +199,6 @@ class DriverFullLoadWorker(Process):
     needed to recreate all the objects (collections and edges) in the domain
     that this driver is responsible for.
     """
-
-    log = logging.getLogger(__name__)
 
     def __init__(self, driver):
         Process.__init__(self)
@@ -214,16 +211,14 @@ class DriverFullLoadWorker(Process):
             if callable(full_load_action):
                 self.driver.full_load()
             else:
-                self.log.error("Driver does not implement 'full_load' method")
+                logger.error("Driver does not implement 'full_load' method")
         except Exception:
-            self.log.exception(
+            logger.exception(
                 'Error syncing updates from driver %s', self.driver)
         return
 
 
 class UpdateExceptionHandler(object):
-
-    log = logging.getLogger(__name__)
 
     def __init__(self):
         self._connect_rabbit()
@@ -236,7 +231,7 @@ class UpdateExceptionHandler(object):
 
     def handle_exception(self, driver_name, update, retry=True):
         try:
-            self.log.debug('Sending failing update to rabbitmq error queue')
+            logger.debug('Sending failing update to rabbitmq error queue')
             collection = update.get('collection')
             key = 'globomap.error.{}.{}'.format(driver_name, collection)
             self.rabbit_mq.post_message(
@@ -246,8 +241,8 @@ class UpdateExceptionHandler(object):
             )
         except ConnectionClosed:
             if retry:
-                self.log.error('RabbitMQ Connection closed, reconnecting')
+                logger.error('RabbitMQ Connection closed, reconnecting')
                 self._connect_rabbit()
                 self.handle_exception(driver_name, update, False)
         except Exception as err:
-            self.log.exception('Unable to handle exception %s', err)
+            logger.exception('Unable to handle exception %s', err)
