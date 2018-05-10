@@ -25,6 +25,9 @@ tests: clean ## Run tests
 	@export ENV=test
 	@nosetests --verbose --rednose  --nocapture --cover-package=globomap_core_loader --with-coverage
 
+tests_ci: clean ## Make tests to CI
+	@nosetests --verbose --rednose  --nocapture --cover-package=globomap_core_loader
+
 run_version_control: ## Run version control
 	@echo "Running version control..."
 	@python3.6 migrations/manage.py version_control || true
