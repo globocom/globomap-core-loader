@@ -14,12 +14,12 @@
    limitations under the License.
 """
 # !/usr/bin/env python
-import logging
-import sys
+from logging import config
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 from globomap_core_loader.loader import CoreLoader
+from globomap_core_loader.settings import LOGGING
 from globomap_core_loader.settings import SCHEDULER_FREQUENCY_EXEC
 
 sched = BlockingScheduler()
@@ -27,12 +27,7 @@ sched = BlockingScheduler()
 
 @sched.scheduled_job('cron', day_of_week='0-6', hour=SCHEDULER_FREQUENCY_EXEC)
 def run_loader():
-    logging.basicConfig(
-        level=logging.WARNING,
-        format='%(asctime)s %(threadName)s %(levelname)s %(message)s',
-        stream=sys.stdout
-    )
-
+    config.dictConfig(LOGGING)
     CoreLoader().full_load()
 
 

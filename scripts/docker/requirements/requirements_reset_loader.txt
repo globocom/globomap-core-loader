@@ -1,0 +1,5 @@
+globomap-api-client==0.0.12
+globomap-auth-manager==0.0.9
+globomap-driver-acs==0.0.31
+globomap-driver-napi==0.0.25
+globomap-loader-api-client==0.0.2
