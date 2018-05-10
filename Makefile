@@ -26,6 +26,8 @@ tests: clean ## Run tests
 	@nosetests --verbose --rednose  --nocapture --cover-package=globomap_core_loader --with-coverage
 
 tests_ci: clean ## Make tests to CI
+	@echo "Running tests..."
+	@export ENV=test
 	@nosetests --verbose --rednose  --nocapture --cover-package=globomap_core_loader
 
 run_version_control: ## Run version control
