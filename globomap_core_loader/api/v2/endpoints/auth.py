@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
    Copyright 2018 Globo.com
 
@@ -41,8 +40,12 @@ class CreateAuth(Resource):
 
         try:
             data = request.get_json()
-            username = data.get('username')
-            password = data.get('password')
+            if type(data) is dict:
+                username = data.get('username')
+                password = data.get('password')
+            else:
+                username = None
+                password = None
             if not username or not password:
                 app.logger.error('Username and Password is required.')
                 api.abort(401, errors='Username and Password is required.')
@@ -51,7 +54,7 @@ class CreateAuth(Resource):
             return token, 200
 
         except exceptions.Unauthorized:
-            app.logger.error('User not Unauthorized.')
+            app.logger.error('User %s not Unauthorized.', username)
             api.abort(401, 'User not Unauthorized.')
 
         except exceptions.AuthException:
