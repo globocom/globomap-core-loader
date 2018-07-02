@@ -12,7 +12,7 @@ services:
             - ./scripts/docker/queue/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro
             - ./scripts/docker/queue/definitions.json:/etc/rabbitmq/definitions.json:ro
         networks:
-            - globomapapi_globomap_net
+            - globomap-api_globomap_net
 
     db:
         container_name: globomap_loader_db_mysql
@@ -25,7 +25,7 @@ services:
         volumes:
             - globomap_loader_db_vol:/var/lib/mysql
         networks:
-            - globomapapi_globomap_net
+            - globomap-api_globomap_net
 
     api-loader:
         container_name: globomap_loader_api
@@ -40,7 +40,7 @@ services:
         volumes:
             - .:/app
         networks:
-            - globomapapi_globomap_net
+            - globomap-api_globomap_net
         command: make run_api
         depends_on:
             - db
@@ -58,7 +58,7 @@ services:
         volumes:
             - .:/app
         networks:
-            - globomapapi_globomap_net
+            - globomap-api_globomap_net
         command: sh ./scripts/docker/loader/docker-start-loader.sh
         depends_on:
             - db
@@ -68,7 +68,7 @@ services:
             - queue:globomap_loader_queue
 
 networks:
-    globomapapi_globomap_net:
+    globomap-api_globomap_net:
         external: true
 
 volumes:
