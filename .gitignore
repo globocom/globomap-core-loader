@@ -98,3 +98,5 @@ ENV/
 *.db
 
 Procfile
+
+docker-compose-temp.yml

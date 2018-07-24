@@ -12,11 +12,20 @@ Drivers:
 
 ## Starting Project:
 
-` make docker `
+` make dynamic_ports` <br>
+` make containers_build ` (Build images.) <br>
+` make containers_start ` (Up containers) <br>
+
+## Running local with docker:
+
+` make dynamic_ports` <br>
+` make containers_build ` (When project not started yet.) <br>
+` make containers_start ` (When project not started yet.) <br>
 
 ## Running Tests:
 
-` make docker ` (When project not started yet.)<br>
+` make containers_build ` (When project not started yet.) <br>
+` make containers_start ` (When project not started yet.) <br>
 ` make tests `
 
 ## Deploy in Tsuru:

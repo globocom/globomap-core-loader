@@ -3,6 +3,8 @@
 # Pip executable path
 PIP := $(shell which pip)
 
+DOCKER_COMPOSE_FILE=$(shell make docker_file)
+
 help:
 	@echo
 	@echo "Please use 'make <target>' where <target> is one of"
@@ -73,7 +75,24 @@ deploy_loader: ## Deploy Loader
 # 	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_reset_loader.py
 # 	@rm Procfile
 
-docker: ## Run a development web server
-	@echo "Running docker..."
-	@docker-compose build
-	@docker-compose up -d
+containers_start:## Start containers
+	docker-compose --file $(DOCKER_COMPOSE_FILE) up -d
+
+containers_build: ## Build containers
+	docker-compose --file $(DOCKER_COMPOSE_FILE) build --no-cache
+
+containers_stop: ## Stop containers
+	docker-compose --file $(DOCKER_COMPOSE_FILE) stop 
+
+containers_clean: ## Destroy containers
+	docker-compose --file $(DOCKER_COMPOSE_FILE) rm -s -v -f
+
+dynamic_ports: ## Set ports to services
+	./scripts/docker/ports.sh
+
+docker_file:
+	@if [[ -f "docker-compose-temp.yml" ]]; then \
+		echo "docker-compose-temp.yml"; 		 \
+	else                                         \
+		echo "docker-compose.yml";               \
+    fi
