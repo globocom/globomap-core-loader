@@ -1,12 +1,5 @@
 #!/bin/bash
-export GMAP_QUEUE_PORT=7007
-export GMAP_QUEUE_ADM_PORT=7008
-export GMAP_DB_LOADER=7009
-export GMAP_LOADER_API=7010
-export GMAP_LOADER_API_DEBUG=7011
 
-
-#!/bin/bash
 if [ -z "${GMAP_QUEUE_PORT}" ]; then
     echo "Environment variable GMAP_QUEUE_PORT is not defined."
     echo "Setting default ..."
