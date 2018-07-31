@@ -21,7 +21,8 @@ from globomap_auth_manager import exceptions
 from globomap_core_loader.api.v2 import api
 from globomap_core_loader.api.v2.auth import facade
 from globomap_core_loader.api.v2.auth.exceptions import AuthException
-from globomap_core_loader.api.v2.parsers import auth_parser
+from globomap_core_loader.api.v2.util import get_dict
+from globomap_core_loader.settings import SPECS
 
 ns = api.namespace(
     'auth', description='Operations related to auth')
@@ -34,7 +35,7 @@ class CreateAuth(Resource):
         200: 'Success',
         401: 'Unauthorized',
     })
-    @api.expect(auth_parser)
+    @api.expect(api.schema_model('Auth', get_dict(SPECS.get('auth'))))
     def post(self):
         """Create token"""
 

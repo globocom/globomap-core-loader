@@ -65,6 +65,7 @@ DRIVERS = [
 
 SPECS = {
     'updates': 'globomap_core_loader/api/specs/updates.json',
+    'auth': 'globomap_core_loader/api/specs/auth.json',
 }
 
 SENTRY_DSN = os.getenv('SENTRY_DSN')
@@ -94,12 +95,12 @@ LOGGING = {
         'globomap_loader_api': {
             'handlers': ['default', 'sentry'],
             'level': 'WARNING',
-            'propagate': False
+            'propagate': True
         },
         'globomap_core_loader': {
             'handlers': ['default', 'sentry'],
             'level': 'WARNING',
-            'propagate': False
+            'propagate': True
         }
     }
 }

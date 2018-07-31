@@ -27,7 +27,7 @@ from globomap_core_loader.api.job import models
 from globomap_core_loader.api.v2 import api
 from globomap_core_loader.api.v2.auth import permissions
 from globomap_core_loader.api.v2.auth.decorators import permission_classes
-from globomap_core_loader.api.v2.parsers import post_updates_parser
+from globomap_core_loader.api.v2.util import get_dict
 from globomap_core_loader.settings import SPECS
 
 
@@ -56,17 +56,15 @@ class Updates(Resource):
         401: 'Unauthorized',
         403: 'Forbidden'
     })
-    @api.expect(post_updates_parser)
+    @api.expect(api.schema_model('Updates',
+                                 get_dict(SPECS.get('updates'))))
     @permission_classes((permissions.Update,))
     def post(self):
         """Post a list of messages."""
 
-        post_updates_parser.parse_args(request)
-
         try:
             updates = request.get_json()
-            spec = SPECS.get('updates')
-            util.json_validate(spec).validate(updates)
+
             driver_name = request.headers.get('X-DRIVER-NAME', '*')
 
             job_id = LoaderAPIFacade().publish_updates(updates, driver_name)
@@ -75,6 +73,7 @@ class Updates(Resource):
                 'jobid': job_id
             }
             return res, 202, {'Location': '{}/job/{}'.format(request.path, job_id)}
+
         except ValidationError as error:
             app.logger.exception('Error sending updates to rabbitmq')
             api.abort(400, errors=util.validate(error))
