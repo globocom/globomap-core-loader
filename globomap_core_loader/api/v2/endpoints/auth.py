@@ -18,10 +18,10 @@ from flask import request
 from flask_restplus import Resource
 from globomap_auth_manager import exceptions
 
+from globomap_core_loader.api.util import get_dict
 from globomap_core_loader.api.v2 import api
 from globomap_core_loader.api.v2.auth import facade
 from globomap_core_loader.api.v2.auth.exceptions import AuthException
-from globomap_core_loader.api.v2.util import get_dict
 from globomap_core_loader.settings import SPECS
 
 ns = api.namespace(

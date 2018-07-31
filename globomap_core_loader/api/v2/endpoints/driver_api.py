@@ -27,7 +27,6 @@ from globomap_core_loader.api.job import models
 from globomap_core_loader.api.v2 import api
 from globomap_core_loader.api.v2.auth import permissions
 from globomap_core_loader.api.v2.auth.decorators import permission_classes
-from globomap_core_loader.api.v2.util import get_dict
 from globomap_core_loader.settings import SPECS
 
 
@@ -57,7 +56,7 @@ class Updates(Resource):
         403: 'Forbidden'
     })
     @api.expect(api.schema_model('Updates',
-                                 get_dict(SPECS.get('updates'))))
+                                 util.get_dict(SPECS.get('updates'))))
     @permission_classes((permissions.Update,))
     def post(self):
         """Post a list of messages."""
