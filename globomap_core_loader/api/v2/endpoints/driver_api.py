@@ -47,6 +47,12 @@ ns = api.namespace(
     required=True,
     default=''
 )
+@api.header(
+    'x-job-controller',
+    'Must have job controller',
+    required=False,
+    default='0'
+)
 class Updates(Resource):
 
     @api.doc(responses={
