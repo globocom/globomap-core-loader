@@ -1,4 +1,4 @@
-globomap-api-client==1.0.2
+globomap-api-client==1.0.3
 globomap-auth-manager==0.0.9
 globomap-driver-acs==0.0.34
 globomap-driver-napi==0.0.29
