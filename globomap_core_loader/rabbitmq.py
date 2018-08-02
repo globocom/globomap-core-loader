@@ -44,7 +44,6 @@ class RabbitMQClient(object):
         self.channel.basic_nack(delivery_tag)
 
     def post_message(self, exchange_name, key, message, confirm=True):
-        self.channel.tx_select()
         published = self.channel.basic_publish(
             exchange=exchange_name,
             routing_key=key,
@@ -56,7 +55,9 @@ class RabbitMQClient(object):
         return confirm
 
     def confirm_publish(self):
+        self.channel.tx_select()
         self.channel.tx_commit()
 
     def discard_publish(self):
+        self.channel.tx_select()
         self.channel.tx_rollback()

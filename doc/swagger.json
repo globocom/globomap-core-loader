@@ -1,0 +1,295 @@
+{
+    "swagger": "2.0",
+    "basePath": "/v2",
+    "paths": {
+        "/auth/": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "summary": "Create token",
+                "operationId": "post_create_auth",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Auth"
+                        }
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/healthcheck/": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "503": {
+                        "description": "Service Unavailable"
+                    }
+                },
+                "operationId": "get_healthcheck",
+                "tags": [
+                    "healthcheck"
+                ]
+            }
+        },
+        "/healthcheck/deps/": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "operationId": "get_healthcheck_deps",
+                "tags": [
+                    "healthcheck"
+                ]
+            }
+        },
+        "/updates/": {
+            "parameters": [
+                {
+                    "required": true,
+                    "default": "",
+                    "in": "header",
+                    "description": "Name of Driver",
+                    "name": "x-driver-name",
+                    "type": "string"
+                },
+                {
+                    "required": true,
+                    "default": "Token token=",
+                    "in": "header",
+                    "description": "Token Authorization",
+                    "name": "Authorization",
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Validation Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "summary": "Post a list of messages",
+                "operationId": "post_updates",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/PostUpdates"
+                        }
+                    }
+                ],
+                "tags": [
+                    "updates"
+                ]
+            }
+        },
+        "/updates/job/{job_id}": {
+            "parameters": [
+                {
+                    "required": true,
+                    "default": "Token token=",
+                    "in": "header",
+                    "description": "Token Authorization",
+                    "name": "Authorization",
+                    "type": "string"
+                },
+                {
+                    "name": "job_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "operationId": "get_job",
+                "tags": [
+                    "updates"
+                ]
+            }
+        }
+    },
+    "info": {
+        "title": "GloboMap Loader API",
+        "version": "2.0",
+        "description": "GloboMap Loader API"
+    },
+    "produces": [
+        "application/json"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "tags": [
+        {
+            "name": "default",
+            "description": "Default namespace"
+        },
+        {
+            "name": "healthcheck",
+            "description": "Operations related to updates"
+        },
+        {
+            "name": "auth",
+            "description": "Operations related to auth"
+        },
+        {
+            "name": "updates",
+            "description": "Operations related to updates"
+        },
+        {
+            "name": "healthcheck",
+            "description": "Operations related to updates"
+        }
+    ],
+    "definitions": {
+        "Auth": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "username",
+                "password"
+            ]
+        },
+        "PostUpdates": {
+            "items": {
+                "properties": {
+                    "action": {
+                        "enum": [
+                            "DELETE",
+                            "PATCH",
+                            "UPDATE",
+                            "CREATE",
+                            "CLEAR"
+                        ],
+                        "type": "string"
+                    },
+                    "collection": {
+                        "minimum": 1,
+                        "type": "string"
+                    },
+                    "element": {
+                        "additionalProperties": false,
+                        "items": {
+                            "properties": {
+                                "field": {
+                                    "type": "string"
+                                },
+                                "operator": {
+                                    "type": "string"
+                                },
+                                "value": {}
+                            }
+                        },
+                        "properties": {
+                            "from": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "minimum": 1,
+                                "pattern": "^([a-zA-Z0-9=._-]){1,}$",
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "properties": {
+                                "type": "object"
+                            },
+                            "properties_metadata": {
+                                "type": "object"
+                            },
+                            "provider": {
+                                "type": "string"
+                            },
+                            "timestamp": {
+                                "type": "integer"
+                            },
+                            "to": {
+                                "type": "string"
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "array"
+                        ]
+                    },
+                    "key": {
+                        "minimum": 1,
+                        "pattern": "^([a-zA-Z0-9=._-]){1,}$",
+                        "type": "string"
+                    },
+                    "type": {
+                        "enum": [
+                            "edges",
+                            "collections"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "action",
+                    "type",
+                    "collection"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        }
+    },
+    "responses": {
+        "ParseError": {
+            "description": "When a mask can't be parsed"
+        },
+        "MaskError": {
+            "description": "When any error occurs on mask"
+        }
+    }
+}

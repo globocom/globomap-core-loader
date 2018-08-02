@@ -1,5 +1,4 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
   "items": {
     "properties": {
       "action": {
@@ -80,10 +79,7 @@
       "type",
       "collection"
     ],
-    "type": [
-      "array",
-      "object"
-    ]
+    "type": "object"
   },
   "type": "array"
 }

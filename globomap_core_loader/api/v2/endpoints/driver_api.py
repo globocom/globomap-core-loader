@@ -55,22 +55,24 @@ class Updates(Resource):
         401: 'Unauthorized',
         403: 'Forbidden'
     })
-    @api.expect(api.schema_model('Updates',
-                                 util.get_dict(SPECS.get('updates'))))
     @permission_classes((permissions.Update,))
+    @api.expect(api.schema_model('PostUpdates',
+                                 util.get_dict(SPECS.get('updates'))))
     def post(self):
         """Post a list of messages."""
 
         try:
-            updates = request.get_json()
-
+            data = request.get_json()
             driver_name = request.headers.get('X-DRIVER-NAME', '*')
-
-            job_id = LoaderAPIFacade().publish_updates(updates, driver_name)
+            job_controller = request.headers.get(
+                'X-JOB-CONTROLLER', '0') == '1'
+            job_id = LoaderAPIFacade().publish_updates(data, driver_name, job_controller)
             res = {
                 'message': 'Updates published successfully',
-                'jobid': job_id
             }
+            if job_id:
+                res.update({'jobid': job_id})
+
             return res, 202, {'Location': '{}/job/{}'.format(request.path, job_id)}
 
         except ValidationError as error:
