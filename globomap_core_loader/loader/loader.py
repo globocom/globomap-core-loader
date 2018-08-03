@@ -150,15 +150,19 @@ class DriverWorker(Process):
             )
             self.update_job_success(update.get('jobid'))
         except GloboMapException as e:
+            if type(e.message) == bytes:
+                error_msg = e.message.decode('utf-8')
+            else:
+                error_msg = e.message
+
             logger.error('Could not process update: %s', update)
             logger.error('Status code: %s', e.status_code)
             logger.error('Response body: %s', e.message)
 
             try:
                 self.update_job_error(update.get('jobid'), update, e)
-
                 update['status'] = e.status_code
-                update['error_msg'] = e.message
+                update['error_msg'] = error_msg
                 name = update.get('driver_name', self.name)
 
                 self.exception_handler.handle_exception(name, update)
