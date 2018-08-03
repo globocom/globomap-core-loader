@@ -55,7 +55,7 @@ run_api: run_migrations ## Run the loader API app
 deploy_api: ## Deploy API
 	@cp scripts/tsuru/Procfile_api Procfile
 	@cp scripts/docker/requirements/requirements_api.txt requirements.txt
-	@cp scripts/run_loader.py run_api.py
+	@cp scripts/run_api.py run_api.py
 	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_api.py .python-version || true
 	@rm Procfile
 	@rm requirements.txt
@@ -70,10 +70,14 @@ deploy_loader: ## Deploy Loader
 	@rm requirements.txt
 	@rm run_loader.py
 
-# deploy_reset_loader:
-# 	@cp scripts/tsuru/Procfile_reset_loader Procfile
-# 	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader run_reset_loader.py
-# 	@rm Procfile
+deploy_reset_loader: ## Deploy reset loader
+	@cp scripts/tsuru/Procfile_reset_loader Procfile
+	@cp scripts/docker/requirements/requirements_reset_loader.txt requirements.txt
+	@cp scripts/scheduler_reset_loader.py scheduler_reset_loader.py
+	@tsuru app-deploy -a $(project) Procfile requirements.txt requirements.apt globomap_core_loader scheduler_reset_loader.py .python-version || true
+	@rm Procfile
+	@rm requirements.txt
+	@rm scheduler_reset_loader.py
 
 containers_start:## Start containers
 	docker-compose --file $(DOCKER_COMPOSE_FILE) up -d
@@ -82,7 +86,7 @@ containers_build: ## Build containers
 	docker-compose --file $(DOCKER_COMPOSE_FILE) build --no-cache
 
 containers_stop: ## Stop containers
-	docker-compose --file $(DOCKER_COMPOSE_FILE) stop 
+	docker-compose --file $(DOCKER_COMPOSE_FILE) stop
 
 containers_clean: ## Destroy containers
 	docker-compose --file $(DOCKER_COMPOSE_FILE) rm -s -v -f

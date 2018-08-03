@@ -18,7 +18,7 @@ from logging import config
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from globomap_core_loader.loader import CoreLoader
+from globomap_core_loader.loader.loader import CoreLoader
 from globomap_core_loader.settings import LOGGING
 from globomap_core_loader.settings import SCHEDULER_FREQUENCY_EXEC
 

@@ -25,7 +25,6 @@ from globomap_core_loader.api import util
 from globomap_core_loader.api.facade import LoaderAPIFacade
 from globomap_core_loader.api.job import models
 from globomap_core_loader.api.v1 import api
-from globomap_core_loader.settings import SPECS
 
 
 ns = api.namespace(
@@ -38,20 +37,19 @@ class Updates(Resource):
     def post(self):
         """Post a list of messages."""
         try:
-            updates = request.get_json()
-            if not updates or len(updates) == 0:
-                raise BadRequest('Invalid empty request')
-
-            spec = SPECS.get('updates')
-            util.json_validate(spec).validate(updates)
+            data = request.get_json()
             driver_name = request.headers.get('X-DRIVER-NAME', '*')
-
-            job_id = LoaderAPIFacade().publish_updates(updates, driver_name)
+            job_controller = request.headers.get(
+                'X-JOB-CONTROLLER', '0') == '1'
+            job_id = LoaderAPIFacade().publish_updates(data, driver_name, job_controller)
             res = {
                 'message': 'Updates published successfully',
-                'jobid': job_id
             }
+            if job_id:
+                res.update({'jobid': job_id})
+
             return res, 202, {'Location': '{}/job/{}'.format(request.path, job_id)}
+
         except ValidationError as error:
             app.logger.exception('Error sending updates to rabbitmq')
             api.abort(400, errors=util.validate(error))
