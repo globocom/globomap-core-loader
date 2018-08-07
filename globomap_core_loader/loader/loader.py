@@ -156,8 +156,8 @@ class DriverWorker(Process):
                 error_msg = e.message
 
             logger.error('Could not process update: %s', update)
-            logger.error('Status code: %s', e.status_code)
-            logger.error('Response body: %s', e.message)
+            logger.debug('Status code: %s', e.status_code)
+            logger.debug('Response body: %s', e.message)
 
             try:
                 self.update_job_error(update.get('jobid'), update, e)
@@ -245,7 +245,7 @@ class UpdateExceptionHandler(object):
             )
         except ConnectionClosed:
             if retry:
-                logger.error('RabbitMQ Connection closed, reconnecting')
+                logger.warning('RabbitMQ Connection closed, reconnecting')
                 self._connect_rabbit()
                 self.handle_exception(driver_name, update, False)
         except Exception as err:

@@ -1,7 +1,7 @@
 APScheduler==3.5.1
 globomap-api-client==1.0.4
 globomap-auth-manager==0.0.9
-globomap-driver-acs==0.0.35
+globomap-driver-acs==0.0.36
 globomap-driver-napi==0.0.29
 globomap-loader-api-client==0.0.5
 mysqlclient==1.3.12
