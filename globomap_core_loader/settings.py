@@ -101,6 +101,31 @@ LOGGING = {
             'handlers': ['default', 'sentry'],
             'level': 'WARNING',
             'propagate': True
+        },
+        'globomap_driver_napi': {
+            'handlers': ['default', 'sentry'],
+            'level': 'WARNING',
+            'propagate': True
+        },
+        'globomap_driver_acs': {
+            'handlers': ['default', 'sentry'],
+            'level': 'WARNING',
+            'propagate': True
+        },
+        'globomap_auth_manager': {
+            'handlers': ['default', 'sentry'],
+            'level': 'WARNING',
+            'propagate': True
+        },
+        'globomap_api_client': {
+            'handlers': ['default', 'sentry'],
+            'level': 'WARNING',
+            'propagate': True
+        },
+        'globomap_loader_api_client': {
+            'handlers': ['default', 'sentry'],
+            'level': 'WARNING',
+            'propagate': True
         }
     }
 }

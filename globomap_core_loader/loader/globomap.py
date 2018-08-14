@@ -42,6 +42,7 @@ class GloboMapClient(object):
         self.doc = Document(auth=self.auth)
 
     def update_element_state(self, action, type, collection, element, key, retries=0):
+
         try:
             if action.upper() == 'CREATE':
                 return self.create(type, collection, element)
@@ -87,7 +88,7 @@ class GloboMapClient(object):
 
         except exceptions.ApiError as err:
 
-            if err.status_code in (502, 503) and retries < 3:
+            if err.status_code in (502, 503, 504) and retries < 3:
                 logger.warning(
                     'Retry send element %s %s %s %s %s',
                     action, type, collection, element, key
