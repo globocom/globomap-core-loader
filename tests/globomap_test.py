@@ -30,20 +30,20 @@ class TestGloboMapCllient(unittest.TestCase):
     def tearDownClass(cls):
         patch.stopall()
 
-    # def test_create_element(self):
-    #     requests_mock = self._mock_request([200])
+    def test_create_element(self):
+        requests_mock = self._mock_request([200])
 
-    #     payload = open_json('tests/json/globomap/vip.json')
-    #     self.globomap_client.update_element_state(
-    #         'CREATE', 'collections', 'vip', payload, None
-    #     )
-    #     self._assert_request_called(
-    #         requests_mock,
-    #         'POST',
-    #         'http://localhost:8080/collections/vip/',
-    #         {'Content-Type': 'application/json'},
-    #         payload
-    #     )
+        payload = open_json('tests/json/globomap/vip.json')
+        self.globomap_client.update_element_state(
+            'CREATE', 'collections', 'vip', payload, None
+        )
+        self._assert_request_called(
+            requests_mock,
+            'POST',
+            'http://localhost:8080/collections/vip/',
+            {'Content-Type': 'application/json'},
+            payload
+        )
 
     # def test_create_element_expect_exception(self):
     #     with self.assertRaises(GloboMapException):
